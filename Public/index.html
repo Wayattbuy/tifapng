@@ -5,728 +5,290 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>tifapng 🐱</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --cream: #FDF6EC;
-  --warm: #F5E6D0;
-  --orange: #E8834A;
-  --orange-deep: #C4592A;
-  --cat-brown: #8B5E3C;
-  --cat-gray: #9BA4B4;
-  --dark: #1A1108;
-  --dark2: #2D1F0E;
-  --text: #3D2B1A;
-  --muted: #8B7355;
-  --white: #FFFFFF;
-  --green: #5A9E6F;
-  --red: #D94F3D;
-  --blue: #4A7FB5;
-  --kids-bg: #FFF5F9;
-  --kids-pink: #FF85A1;
-  --kids-purple: #A78BFA;
-  --kids-yellow: #FCD34D;
-  --kids-green: #6EE7B7;
-  --shadow: 0 4px 24px rgba(26,17,8,0.10);
-  --shadow-lg: 0 12px 48px rgba(26,17,8,0.18);
-  --radius: 18px;
-  --radius-sm: 10px;
-}
+:root{--cream:#FDF6EC;--warm:#F5E6D0;--orange:#E8834A;--orange-deep:#C4592A;--cat-brown:#8B5E3C;--cat-gray:#9BA4B4;--dark:#1A1108;--text:#3D2B1A;--muted:#8B7355;--green:#5A9E6F;--red:#D94F3D;--kids-bg:#FFF5F9;--kids-pink:#FF85A1;--kids-purple:#A78BFA;--kids-yellow:#FCD34D;--kids-green:#6EE7B7;--shadow:0 4px 24px rgba(26,17,8,.10);--shadow-lg:0 12px 48px rgba(26,17,8,.18);--radius:18px;--radius-sm:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--warm)}::-webkit-scrollbar-thumb{background:var(--orange);border-radius:3px}
+.page{display:none;min-height:100vh}.page.active{display:block}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(253,246,236,.94);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--warm);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.nav-logo{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--orange);cursor:pointer;letter-spacing:-1px;display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:6px;align-items:center}
+.nav-btn{padding:8px 16px;border-radius:50px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.nav-btn.ghost{background:transparent;color:var(--text)}.nav-btn.ghost:hover{background:var(--warm)}
+.nav-btn.primary{background:var(--orange);color:white}.nav-btn.primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
+.nav-btn.kids{background:var(--kids-pink);color:white;font-weight:600}.nav-btn.kids:hover{filter:brightness(1.1)}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:white;border:2.5px solid var(--orange-deep);transition:transform .2s;overflow:hidden}
+.nav-avatar:hover{transform:scale(1.08)}.nav-avatar img{width:100%;height:100%;object-fit:cover}
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--cream);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+/* HERO */
+#page-landing{background:var(--cream);padding-top:64px}
+.hero{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(232,131,74,.15) 0%,transparent 70%);pointer-events:none}
+.hero-paws{position:absolute;font-size:80px;opacity:.06;animation:float 6s ease-in-out infinite;pointer-events:none}
+.hero-paws:nth-child(1){top:10%;left:5%;animation-delay:0s}.hero-paws:nth-child(2){top:20%;right:8%;animation-delay:2s}.hero-paws:nth-child(3){bottom:20%;left:10%;animation-delay:4s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--warm);border:1.5px solid rgba(232,131,74,.3);border-radius:50px;padding:6px 16px;font-size:13px;font-weight:500;color:var(--orange-deep);margin-bottom:28px;animation:fadeUp .6s ease both}
+.hero-title{font-family:'Fraunces',serif;font-size:clamp(56px,10vw,110px);font-weight:900;line-height:.95;color:var(--dark);animation:fadeUp .6s .1s ease both}
+.hero-title .accent{color:var(--orange)}.hero-title .italic{font-style:italic;font-weight:300}
+.hero-sub{max-width:480px;margin:24px auto 40px;font-size:18px;color:var(--muted);line-height:1.6;animation:fadeUp .6s .2s ease both}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
+.btn{padding:14px 28px;border-radius:50px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--orange);color:white;box-shadow:0 4px 16px rgba(232,131,74,.4)}.btn-primary:hover{background:var(--orange-deep);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--cat-brown)}.btn-outline:hover{background:var(--warm);transform:translateY(-2px)}
+.btn-kids{background:linear-gradient(135deg,var(--kids-pink),var(--kids-purple));color:white}.btn-kids:hover{transform:translateY(-2px) scale(1.02)}
+.preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:40px auto;padding:0 24px;animation:fadeUp .8s .4s ease both}
+.preview-card{border-radius:var(--radius);overflow:hidden;background:var(--warm);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:60px;box-shadow:var(--shadow);cursor:pointer;transition:transform .3s,box-shadow .3s}
+.preview-card:hover{transform:translateY(-6px) rotate(1deg);box-shadow:var(--shadow-lg)}.preview-card:nth-child(2){transform:translateY(16px)}.preview-card:nth-child(2):hover{transform:translateY(10px) rotate(-1deg)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--warm); }
-::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
-
-/* ── PAGE SYSTEM ── */
-.page { display: none; min-height: 100vh; }
-.page.active { display: block; }
-
-/* ════════════════════════════════
-   NAVBAR
-════════════════════════════════ */
-.navbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  background: rgba(253,246,236,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1.5px solid var(--warm);
-  height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px;
-}
-.nav-logo {
-  font-family: 'Fraunces', serif;
-  font-size: 26px;
-  font-weight: 900;
-  color: var(--orange);
-  cursor: pointer;
-  letter-spacing: -1px;
-  display: flex; align-items: center; gap: 8px;
-}
-.nav-logo span { font-size: 22px; }
-.nav-links { display: flex; gap: 6px; align-items: center; }
-.nav-btn {
-  padding: 8px 16px; border-radius: 50px; border: none;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all 0.2s;
-}
-.nav-btn.ghost { background: transparent; color: var(--text); }
-.nav-btn.ghost:hover { background: var(--warm); }
-.nav-btn.primary { background: var(--orange); color: white; }
-.nav-btn.primary:hover { background: var(--orange-deep); transform: translateY(-1px); }
-.nav-btn.kids { background: var(--kids-pink); color: white; font-weight: 600; }
-.nav-btn.kids:hover { filter: brightness(1.1); }
-.nav-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--orange); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 700; color: white;
-  border: 2.5px solid var(--orange-deep);
-  transition: transform 0.2s;
-  overflow: hidden;
-}
-.nav-avatar:hover { transform: scale(1.08); }
-.nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-/* ════════════════════════════════
-   HERO / LANDING
-════════════════════════════════ */
-#page-landing {
-  background: var(--cream);
-  padding-top: 64px;
-}
-.hero {
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; text-align: center;
-  padding: 100px 24px 60px;
-  position: relative; overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 50% at 50% 30%, rgba(232,131,74,0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-paws {
-  position: absolute; font-size: 80px; opacity: 0.06;
-  animation: float 6s ease-in-out infinite;
-  pointer-events: none;
-}
-.hero-paws:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
-.hero-paws:nth-child(2) { top: 20%; right: 8%; animation-delay: 2s; }
-.hero-paws:nth-child(3) { bottom: 20%; left: 10%; animation-delay: 4s; }
-@keyframes float { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-20px) rotate(5deg)} }
-
-.hero-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--warm); border: 1.5px solid rgba(232,131,74,0.3);
-  border-radius: 50px; padding: 6px 16px;
-  font-size: 13px; font-weight: 500; color: var(--orange-deep);
-  margin-bottom: 28px; animation: fadeUp 0.6s ease both;
-}
-.hero-title {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(56px, 10vw, 110px);
-  font-weight: 900; line-height: 0.95;
-  color: var(--dark);
-  animation: fadeUp 0.6s 0.1s ease both;
-}
-.hero-title .accent { color: var(--orange); }
-.hero-title .italic { font-style: italic; font-weight: 300; }
-.hero-sub {
-  max-width: 480px; margin: 24px auto 40px;
-  font-size: 18px; color: var(--muted); line-height: 1.6;
-  animation: fadeUp 0.6s 0.2s ease both;
-}
-.hero-ctas { display: flex; gap: 12px; justify-content: center; animation: fadeUp 0.6s 0.3s ease both; }
-.btn {
-  padding: 14px 28px; border-radius: 50px; border: none;
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-  cursor: pointer; transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-primary { background: var(--orange); color: white; box-shadow: 0 4px 16px rgba(232,131,74,0.4); }
-.btn-primary:hover { background: var(--orange-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,131,74,0.5); }
-.btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--cat-brown); }
-.btn-outline:hover { background: var(--warm); transform: translateY(-2px); }
-.btn-kids {
-  background: linear-gradient(135deg, var(--kids-pink), var(--kids-purple));
-  color: white; box-shadow: 0 4px 16px rgba(255,133,161,0.4);
-}
-.btn-kids:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 24px rgba(255,133,161,0.5); }
-
-/* preview grid */
-.preview-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-  max-width: 900px; margin: 40px auto; padding: 0 24px;
-  animation: fadeUp 0.8s 0.4s ease both;
-}
-.preview-card {
-  border-radius: var(--radius); overflow: hidden;
-  background: var(--warm); aspect-ratio: 4/3;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 60px; box-shadow: var(--shadow);
-  position: relative; cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.preview-card:hover { transform: translateY(-6px) rotate(1deg); box-shadow: var(--shadow-lg); }
-.preview-card:nth-child(2) { transform: translateY(16px); }
-.preview-card:nth-child(2):hover { transform: translateY(10px) rotate(-1deg); }
-
-@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-
-/* ════════════════════════════════
-   FEED PAGE
-════════════════════════════════ */
-#page-feed { padding-top: 64px; }
-.feed-layout {
-  max-width: 1100px; margin: 0 auto;
-  display: grid; grid-template-columns: 260px 1fr 220px; gap: 24px;
-  padding: 32px 16px;
-}
-@media(max-width:900px){ .feed-layout{grid-template-columns:1fr;} .sidebar-left,.sidebar-right{display:none;} }
-
-/* SIDEBAR */
-.sidebar { padding-top: 8px; }
-.sidebar-card {
-  background: white; border-radius: var(--radius); padding: 20px;
-  box-shadow: var(--shadow); margin-bottom: 16px;
-}
-.sidebar-title {
-  font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700;
-  color: var(--dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-}
-.category-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 50px; margin: 4px;
-  font-size: 13px; font-weight: 500; cursor: pointer;
-  border: 1.5px solid transparent; transition: all 0.2s;
-  background: var(--warm); color: var(--text);
-}
-.category-pill:hover, .category-pill.active {
-  background: var(--orange); color: white;
-  border-color: var(--orange-deep);
-}
-.category-pill span { font-size: 14px; }
+/* FEED */
+#page-feed{padding-top:64px}
+.feed-layout{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:260px 1fr 220px;gap:24px;padding:32px 16px}
+@media(max-width:900px){.feed-layout{grid-template-columns:1fr}.sidebar-left,.sidebar-right{display:none}}
+.sidebar{padding-top:8px}
+.sidebar-card{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.sidebar-title{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.category-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;margin:4px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .2s;background:var(--warm);color:var(--text)}
+.category-pill:hover,.category-pill.active{background:var(--orange);color:white;border-color:var(--orange-deep)}
 
 /* PUBLISH BOX */
-.publish-box {
-  background: white; border-radius: var(--radius); padding: 20px;
-  box-shadow: var(--shadow); margin-bottom: 20px;
-  border: 2px dashed var(--warm);
-}
-.publish-box:hover { border-color: var(--orange); }
-.publish-trigger {
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
-}
-.publish-trigger .fake-input {
-  flex: 1; padding: 12px 16px; border-radius: 50px;
-  background: var(--warm); font-size: 14px; color: var(--muted);
-  border: none; cursor: pointer;
-}
+.publish-box{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;border:2px dashed var(--warm);cursor:pointer;transition:border-color .2s}
+.publish-box:hover{border-color:var(--orange)}
+.publish-trigger{display:flex;align-items:center;gap:12px}
+.fake-input{flex:1;padding:12px 16px;border-radius:50px;background:var(--warm);font-size:14px;color:var(--muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
 
-/* POSTS */
-.post-card {
-  background: white; border-radius: var(--radius);
-  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px;
-  animation: fadeUp 0.4s ease both;
-  transition: box-shadow 0.3s;
-}
-.post-card:hover { box-shadow: var(--shadow-lg); }
-.post-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 20px 0;
-}
-.post-avatar {
-  width: 42px; height: 42px; border-radius: 50%; overflow: hidden;
-  background: var(--warm); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 20px;
-  border: 2px solid var(--orange);
-}
-.post-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.post-user-info .username {
-  font-weight: 600; font-size: 14px; cursor: pointer; color: var(--dark);
-}
-.post-user-info .username:hover { color: var(--orange); }
-.post-user-info .meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-.privacy-badge {
-  font-size: 10px; padding: 2px 8px; border-radius: 50px;
-  font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.privacy-public { background: #E8F5E9; color: #2E7D32; }
-.privacy-friends { background: #E3F2FD; color: #1565C0; }
-.privacy-kids { background: #FCE4EC; color: #880E4F; }
-.privacy-private { background: #F3E5F5; color: #6A1B9A; }
-.privacy-custom { background: #FFF3E0; color: #E65100; }
-
-.post-title {
-  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700;
-  padding: 14px 20px 4px; color: var(--dark);
-}
-.post-image {
-  width: 100%; aspect-ratio: 4/3; object-fit: cover;
-  display: block; background: var(--warm);
-  font-size: 80px; display: flex; align-items: center; justify-content: center;
-}
-.post-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.post-actions {
-  padding: 14px 20px; display: flex; align-items: center; gap: 16px;
-  border-top: 1px solid var(--warm);
-}
-.action-btn {
-  background: none; border: none; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-  color: var(--muted); font-size: 14px; font-weight: 500;
-  padding: 6px 10px; border-radius: 8px; transition: all 0.2s;
-}
-.action-btn:hover { background: var(--warm); color: var(--orange); }
-.action-btn.liked { color: var(--red); }
-.action-btn.liked .icon { transform: scale(1.2); }
-.post-desc { padding: 0 20px 12px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+/* POST CARD */
+.post-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;animation:fadeUp .4s ease both;transition:box-shadow .3s}
+.post-card:hover{box-shadow:var(--shadow-lg)}
+.post-header{display:flex;align-items:center;gap:12px;padding:16px 20px 0}
+.post-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;background:var(--warm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;border:2px solid var(--orange);background:var(--orange)}
+.post-avatar img{width:100%;height:100%;object-fit:cover}
+.post-user-info .username{font-weight:600;font-size:14px;cursor:pointer;color:var(--dark)}.post-user-info .username:hover{color:var(--orange)}
+.post-user-info .meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.privacy-badge{font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.privacy-public{background:#E8F5E9;color:#2E7D32}.privacy-friends{background:#E3F2FD;color:#1565C0}.privacy-kids{background:#FCE4EC;color:#880E4F}.privacy-private{background:#F3E5F5;color:#6A1B9A}.privacy-custom{background:#FFF3E0;color:#E65100}
+.post-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;padding:14px 20px 4px;color:var(--dark)}
+.post-img-wrap{aspect-ratio:4/3;overflow:hidden;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:80px;cursor:pointer}
+.post-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.post-img-wrap:hover img{transform:scale(1.02)}
+.post-desc{padding:8px 20px 12px;font-size:14px;color:var(--muted);line-height:1.5}
+.post-actions{padding:14px 20px;display:flex;align-items:center;gap:16px;border-top:1px solid var(--warm)}
+.action-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;font-weight:500;padding:6px 10px;border-radius:8px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.action-btn:hover{background:var(--warm);color:var(--orange)}
+.action-btn.liked{color:var(--red)}.action-btn.liked .like-icon{transform:scale(1.2)}
+.ml-auto{margin-left:auto}
+.delete-btn{color:var(--red)!important}.delete-btn:hover{background:#ffeaea!important;color:var(--red)!important}
 
 /* COMMENTS */
-.comments-section { border-top: 1px solid var(--warm); padding: 14px 20px; }
-.comment {
-  display: flex; gap: 10px; margin-bottom: 12px;
-}
-.comment-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--warm); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 14px;
-}
-.comment-bubble {
-  background: var(--warm); border-radius: 12px; padding: 8px 12px;
-  font-size: 13px; flex: 1;
-}
-.comment-bubble .author { font-weight: 600; font-size: 12px; margin-bottom: 2px; }
-.comment-input-row {
-  display: flex; gap: 10px; align-items: center; margin-top: 8px;
-}
-.comment-input {
-  flex: 1; padding: 8px 14px; border-radius: 50px;
-  border: 1.5px solid var(--warm); background: var(--cream);
-  font-size: 13px; font-family: 'DM Sans', sans-serif;
-  transition: border-color 0.2s; outline: none;
-}
-.comment-input:focus { border-color: var(--orange); }
-.comment-send {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: var(--orange); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; color: white;
-  font-size: 14px; transition: all 0.2s;
-}
-.comment-send:hover { background: var(--orange-deep); transform: scale(1.05); }
+.comments-section{border-top:1px solid var(--warm);padding:14px 20px;display:none}
+.comment{display:flex;gap:10px;margin-bottom:12px;animation:fadeUp .3s ease}
+.comment-avatar{width:32px;height:32px;border-radius:50%;background:var(--orange);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white}
+.comment-bubble{background:var(--warm);border-radius:12px;padding:8px 12px;font-size:13px;flex:1}
+.comment-bubble .author{font-weight:600;font-size:12px;margin-bottom:2px;color:var(--orange-deep)}
+.comment-input-row{display:flex;gap:10px;align-items:center;margin-top:8px}
+.comment-input{flex:1;padding:8px 14px;border-radius:50px;border:1.5px solid var(--warm);background:var(--cream);font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
+.comment-input:focus{border-color:var(--orange)}
+.comment-send{width:34px;height:34px;border-radius:50%;background:var(--orange);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;transition:all .2s}
+.comment-send:hover{background:var(--orange-deep);transform:scale(1.05)}
 
-/* ════════════════════════════════
-   MODAL SYSTEM
-════════════════════════════════ */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 2000;
-  background: rgba(26,17,8,0.6); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal {
-  background: white; border-radius: 24px; padding: 32px;
-  max-width: 480px; width: 100%; box-shadow: var(--shadow-lg);
-  transform: translateY(30px) scale(0.97);
-  transition: transform 0.3s;
-  max-height: 90vh; overflow-y: auto;
-}
-.modal-overlay.open .modal { transform: translateY(0) scale(1); }
-.modal-title {
-  font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900;
-  color: var(--dark); margin-bottom: 24px; text-align: center;
-}
-.modal-title .accent { color: var(--orange); }
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(26,17,8,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:white;border-radius:24px;padding:32px;max-width:480px;width:100%;box-shadow:var(--shadow-lg);transform:translateY(30px) scale(.97);transition:transform .3s;max-height:90vh;overflow-y:auto;position:relative}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-title{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--dark);margin-bottom:24px;text-align:center}
+.modal-title .accent{color:var(--orange)}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close:hover{background:var(--warm)}
 
 /* FORM */
-.form-group { margin-bottom: 18px; }
-.form-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
-.form-input, .form-textarea, .form-select {
-  width: 100%; padding: 12px 16px;
-  border: 1.5px solid var(--warm); border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-  background: var(--cream); color: var(--text);
-  transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-}
-.form-input:focus, .form-textarea:focus, .form-select:focus {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px rgba(232,131,74,0.15);
-}
-.form-textarea { resize: vertical; min-height: 80px; }
-.form-error { font-size: 12px; color: var(--red); margin-top: 4px; }
+.form-group{margin-bottom:18px}
+.form-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;display:block}
+.form-input,.form-textarea,.form-select{width:100%;padding:12px 16px;border:1.5px solid var(--warm);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;background:var(--cream);color:var(--text);transition:border-color .2s,box-shadow .2s;outline:none}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,131,74,.15)}
+.form-textarea{resize:vertical;min-height:80px}
 
-.upload-zone {
-  border: 2px dashed var(--warm); border-radius: var(--radius-sm);
-  padding: 32px; text-align: center; cursor: pointer;
-  transition: all 0.2s; background: var(--cream);
-}
-.upload-zone:hover { border-color: var(--orange); background: rgba(232,131,74,0.05); }
-.upload-zone.has-file { border-color: var(--green); background: rgba(90,158,111,0.05); }
-.upload-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 12px; }
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--warm);border-radius:var(--radius-sm);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--orange);background:rgba(232,131,74,.05)}
+.upload-zone.has-file{border-color:var(--green);background:rgba(90,158,111,.05)}
+.upload-icon{font-size:32px;margin-bottom:8px}
+.upload-preview{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:12px;display:none}
+.upload-progress{height:4px;background:var(--warm);border-radius:2px;margin-top:8px;overflow:hidden;display:none}
+.upload-progress-bar{height:100%;background:var(--orange);border-radius:2px;width:0;transition:width .3s}
 
 /* PRIVACY SELECTOR */
-.privacy-selector { display: flex; flex-wrap: wrap; gap: 8px; }
-.privacy-option {
-  padding: 8px 16px; border-radius: 50px; border: 2px solid var(--warm);
-  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px; background: var(--cream);
-}
-.privacy-option:hover { border-color: var(--orange); }
-.privacy-option.selected { background: var(--orange); color: white; border-color: var(--orange-deep); }
+.privacy-selector{display:flex;flex-wrap:wrap;gap:8px}
+.privacy-option{padding:8px 16px;border-radius:50px;border:2px solid var(--warm);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;background:var(--cream)}
+.privacy-option:hover{border-color:var(--orange)}
+.privacy-option.selected{background:var(--orange);color:white;border-color:var(--orange-deep)}
+.friends-except-input{margin-top:12px;display:none}
+.friends-except-input.visible{display:block}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border:1.5px solid var(--warm);border-radius:10px;min-height:44px;cursor:text;background:var(--cream)}
+.tag{background:var(--orange);color:white;border-radius:50px;padding:3px 10px;font-size:12px;display:flex;align-items:center;gap:4px}
+.tag .remove{cursor:pointer;opacity:.7}.tag .remove:hover{opacity:1}
 
-/* friends-except input */
-.friends-except-input {
-  margin-top: 12px; display: none;
-}
-.friends-except-input.visible { display: block; }
-.tag-input-wrap {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 10px; border: 1.5px solid var(--warm); border-radius: 10px;
-  min-height: 44px; cursor: text; background: var(--cream);
-}
-.tag { 
-  background: var(--orange); color: white;
-  border-radius: 50px; padding: 3px 10px; font-size: 12px;
-  display: flex; align-items: center; gap: 4px;
-}
-.tag .remove { cursor: pointer; opacity: 0.7; }
-.tag .remove:hover { opacity: 1; }
+/* AUTH CARD */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:white;border-radius:28px;padding:44px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)}
+.auth-logo{text-align:center;margin-bottom:32px;font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:var(--orange)}
+.auth-switch{text-align:center;margin-top:20px;font-size:14px;color:var(--muted)}
+.auth-switch a{color:var(--orange);text-decoration:none;font-weight:600;cursor:pointer}.auth-switch a:hover{text-decoration:underline}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0}.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--warm)}.divider span{font-size:12px;color:var(--muted)}
 
-/* ════════════════════════════════
-   AUTH PAGES
-════════════════════════════════ */
-#page-login, #page-register {
-  min-height: 100vh; display: none;
-  align-items: center; justify-content: center;
-  background: var(--cream);
-}
-#page-login.active, #page-register.active { display: flex; }
-.auth-card {
-  background: white; border-radius: 28px; padding: 44px;
-  max-width: 420px; width: 100%; margin: 20px;
-  box-shadow: var(--shadow-lg);
-}
-.auth-logo {
-  text-align: center; margin-bottom: 32px;
-  font-family: 'Fraunces', serif; font-size: 36px; font-weight: 900;
-  color: var(--orange);
-}
-.auth-switch {
-  text-align: center; margin-top: 20px; font-size: 14px; color: var(--muted);
-}
-.auth-switch a { color: var(--orange); text-decoration: none; font-weight: 600; cursor: pointer; }
-.auth-switch a:hover { text-decoration: underline; }
-.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--warm); }
-.divider span { font-size: 12px; color: var(--muted); }
+/* PROFILE */
+#page-profile{padding-top:64px}
+.profile-banner{height:220px;background:linear-gradient(135deg,var(--orange),var(--cat-brown));display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.4;letter-spacing:12px;overflow:hidden;position:relative}
+.profile-body{max-width:900px;margin:0 auto;padding:0 24px}
+.profile-avatar-wrap{margin-top:-55px;display:inline-block;position:relative}
+.profile-avatar{width:110px;height:110px;border-radius:50%;border:5px solid white;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:white;box-shadow:var(--shadow);overflow:hidden}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:16px;margin-bottom:24px}
+.profile-name{font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--dark)}
+.profile-bio{font-size:14px;color:var(--muted);margin-top:4px;max-width:400px}
+.profile-stats{display:flex;gap:32px;margin-top:12px}
+.stat-item{text-align:center}.stat-num{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--dark)}.stat-label{font-size:12px;color:var(--muted)}
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:40px}
+.profile-thumb{aspect-ratio:1;background:var(--warm);cursor:pointer;overflow:hidden;position:relative}
+.profile-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.profile-thumb:hover img{transform:scale(1.05)}
+.profile-thumb-empty{display:flex;align-items:center;justify-content:center;font-size:36px}
 
-/* ════════════════════════════════
-   PROFILE PAGE
-════════════════════════════════ */
-#page-profile { padding-top: 64px; }
-.profile-header {
-  background: linear-gradient(135deg, var(--warm) 0%, var(--cream) 100%);
-  padding: 60px 24px 0; text-align: center; position: relative;
-}
-.profile-banner {
-  height: 200px; background: linear-gradient(135deg, var(--orange), var(--cat-brown));
-  border-radius: 0; overflow: hidden; position: absolute; top: 64px; left: 0; right: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 80px; opacity: 0.3;
-}
-.profile-avatar-wrap {
-  position: relative; display: inline-block; margin-top: 120px; z-index: 1;
-}
-.profile-avatar {
-  width: 110px; height: 110px; border-radius: 50%;
-  border: 5px solid white; background: var(--warm);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px; box-shadow: var(--shadow); overflow: hidden;
-  cursor: pointer;
-}
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.profile-name {
-  font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900;
-  color: var(--dark); margin: 16px 0 4px;
-}
-.profile-bio { font-size: 14px; color: var(--muted); max-width: 400px; margin: 0 auto 20px; }
-.profile-stats { display: flex; gap: 32px; justify-content: center; margin-bottom: 32px; }
-.stat-item { text-align: center; }
-.stat-num { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--dark); }
-.stat-label { font-size: 12px; color: var(--muted); }
-.profile-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-  max-width: 900px; margin: 0 auto; padding: 0 16px 40px;
-}
-.profile-post-thumb {
-  aspect-ratio: 1; background: var(--warm); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 40px;
-  position: relative; overflow: hidden; transition: opacity 0.2s;
-}
-.profile-post-thumb:hover { opacity: 0.85; }
-.profile-post-thumb img { width: 100%; height: 100%; object-fit: cover; }
+/* KIDS */
+#page-kids{padding-top:64px;background:var(--kids-bg);min-height:100vh}
+.kids-hero{text-align:center;padding:60px 24px 40px;background:linear-gradient(180deg,rgba(255,133,161,.1) 0%,transparent 100%)}
+.kids-title{font-family:'Fraunces',serif;font-size:clamp(40px,8vw,80px);font-weight:900;color:var(--dark)}
+.kids-title .accent{color:var(--kids-pink)}
+.kids-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:900px;margin:0 auto;padding:0 24px 40px}
+.kids-feature-card{background:white;border-radius:20px;padding:28px 24px;box-shadow:var(--shadow);text-align:center;border-top:4px solid var(--kids-pink);transition:transform .3s,box-shadow .3s}
+.kids-feature-card:nth-child(2){border-top-color:var(--kids-purple)}.kids-feature-card:nth-child(3){border-top-color:var(--kids-yellow)}.kids-feature-card:nth-child(4){border-top-color:var(--kids-green)}
+.kids-feature-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.kids-feature-icon{font-size:40px;margin-bottom:14px}
+.kids-feature-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:8px}
+.kids-feature-desc{font-size:13px;color:var(--muted);line-height:1.5}
+.parental-dashboard{max-width:900px;margin:0 auto;padding:0 24px 60px}
+.dashboard-card{background:white;border-radius:20px;padding:28px;box-shadow:var(--shadow);margin-bottom:20px}
+.dashboard-card-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.child-account-row{display:flex;align-items:center;gap:14px;padding:14px;background:var(--cream);border-radius:12px;margin-bottom:12px;cursor:pointer;transition:background .2s;border:2px solid transparent}
+.child-account-row:hover{background:var(--warm)}.child-account-row.selected{border-color:var(--kids-pink);background:rgba(255,133,161,.08)}
+.child-avatar-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--kids-pink),var(--kids-purple));display:flex;align-items:center;justify-content:center;font-size:22px}
+.child-info{flex:1}.child-name{font-weight:600;font-size:14px}.child-meta{font-size:12px;color:var(--muted)}
+.toggle-switch{width:46px;height:24px;border-radius:50px;cursor:pointer;background:var(--cat-gray);position:relative;transition:background .3s;border:none;flex-shrink:0}
+.toggle-switch.on{background:var(--kids-green)}.toggle-switch::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:left .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}.toggle-switch.on::after{left:25px}
+.time-display{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--kids-pink);margin:8px 0}
+.time-slider{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;outline:none;cursor:pointer}
+.time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--kids-pink);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.channel-chip{padding:6px 14px;border-radius:50px;font-size:13px;font-weight:500;border:2px solid var(--warm);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;margin:4px}
+.channel-chip.allowed{background:var(--kids-green);color:white;border-color:var(--kids-green)}.channel-chip.blocked{background:var(--red);color:white;border-color:var(--red)}
 
-/* ════════════════════════════════
-   KIDS MODE
-════════════════════════════════ */
-#page-kids {
-  padding-top: 64px;
-  background: var(--kids-bg);
-  min-height: 100vh;
-}
-.kids-navbar {
-  background: linear-gradient(135deg, var(--kids-pink), var(--kids-purple));
-}
-.kids-hero {
-  text-align: center; padding: 60px 24px 40px;
-  background: linear-gradient(180deg, rgba(255,133,161,0.1) 0%, transparent 100%);
-}
-.kids-title {
-  font-family: 'Fraunces', serif; font-size: clamp(40px, 8vw, 80px);
-  font-weight: 900; color: var(--dark);
-  animation: bounce 2s ease infinite;
-}
-.kids-title .accent { color: var(--kids-pink); }
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.kids-sub { font-size: 16px; color: var(--muted); margin: 12px 0 32px; }
-.kids-features {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px; max-width: 900px; margin: 0 auto; padding: 0 24px 60px;
-}
-.kids-feature-card {
-  background: white; border-radius: 20px; padding: 28px 24px;
-  box-shadow: var(--shadow); text-align: center;
-  border-top: 4px solid var(--kids-pink);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.kids-feature-card:nth-child(2) { border-top-color: var(--kids-purple); }
-.kids-feature-card:nth-child(3) { border-top-color: var(--kids-yellow); }
-.kids-feature-card:nth-child(4) { border-top-color: var(--kids-green); }
-.kids-feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.kids-feature-icon { font-size: 40px; margin-bottom: 14px; }
-.kids-feature-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.kids-feature-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+/* KIDS FEED */
+.kids-feed-wrap{max-width:600px;margin:0 auto;padding:0 20px 60px}
+.kids-post-card{background:white;border-radius:20px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow)}
+.kids-timer-bar{background:linear-gradient(135deg,var(--kids-pink),var(--kids-purple));padding:12px 20px;display:flex;align-items:center;justify-content:space-between;color:white;font-size:13px;font-weight:600;border-radius:12px;margin-bottom:20px}
 
-/* PARENTAL DASHBOARD */
-.parental-dashboard {
-  max-width: 900px; margin: 0 auto; padding: 0 24px 60px;
-}
-.dashboard-card {
-  background: white; border-radius: 20px; padding: 28px;
-  box-shadow: var(--shadow); margin-bottom: 20px;
-}
-.dashboard-card-title {
-  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700;
-  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
-}
-.child-account-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px; background: var(--cream); border-radius: 12px; margin-bottom: 12px;
-}
-.child-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--kids-pink); display: flex; align-items: center; justify-content: center; font-size: 22px; }
-.child-info { flex: 1; }
-.child-name { font-weight: 600; font-size: 14px; }
-.child-age { font-size: 12px; color: var(--muted); }
-.child-actions { display: flex; gap: 8px; }
-.toggle-switch {
-  width: 46px; height: 24px; border-radius: 50px; cursor: pointer;
-  background: var(--cat-gray); position: relative; transition: background 0.3s;
-  border: none;
-}
-.toggle-switch.on { background: var(--kids-green); }
-.toggle-switch::after {
-  content: ''; position: absolute; width: 18px; height: 18px;
-  border-radius: 50%; background: white; top: 3px; left: 3px;
-  transition: left 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-.toggle-switch.on::after { left: 25px; }
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--dark);color:white;padding:14px 20px;border-radius:12px;font-size:14px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;animation:slideIn .3s ease,fadeOut .3s 2.7s ease forwards;max-width:300px}
+.toast.success{border-left:4px solid var(--green)}.toast.error{border-left:4px solid var(--red)}.toast.info{border-left:4px solid var(--orange)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0;transform:translateX(100%)}}
 
-.time-slider-wrap { padding: 8px 0; }
-.time-slider {
-  width: 100%; -webkit-appearance: none; height: 6px;
-  border-radius: 3px; background: linear-gradient(90deg, var(--kids-pink) 0%, var(--warm) 0%);
-  outline: none;
-}
-.time-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-  background: var(--kids-pink); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-.time-display { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: var(--kids-pink); margin: 8px 0; }
-
-.allowed-channels-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.channel-chip {
-  padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 500;
-  border: 2px solid var(--warm); cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.channel-chip.allowed { background: var(--kids-green); color: white; border-color: var(--kids-green); }
-.channel-chip.blocked { background: var(--red); color: white; border-color: var(--red); }
-
-/* ════════════════════════════════
-   TOAST
-════════════════════════════════ */
-.toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-.toast {
-  background: var(--dark); color: white; padding: 14px 20px;
-  border-radius: 12px; font-size: 14px; box-shadow: var(--shadow-lg);
-  display: flex; align-items: center; gap: 10px;
-  animation: slideIn 0.3s ease, fadeOut 0.3s 2.7s ease forwards;
-  max-width: 300px;
-}
-.toast.success { border-left: 4px solid var(--green); }
-.toast.error { border-left: 4px solid var(--red); }
-.toast.info { border-left: 4px solid var(--orange); }
-@keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
-@keyframes fadeOut { from{opacity:1} to{opacity:0;transform:translateX(100%)} }
-
-/* ════════════════════════════════
-   LOADER
-════════════════════════════════ */
-.loader { display: flex; justify-content: center; padding: 40px; }
-.spinner {
-  width: 36px; height: 36px; border: 3px solid var(--warm);
-  border-top-color: var(--orange); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to{transform:rotate(360deg)} }
-
-/* EMPTY STATE */
-.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-.empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-.empty-state p { font-size: 15px; }
-
-/* SETUP NOTICE */
-.setup-notice {
-  background: linear-gradient(135deg, #FFF3E0, #FFF8E7);
-  border: 2px solid var(--orange); border-radius: 16px;
-  padding: 24px; margin: 20px; max-width: 700px; margin: 30px auto;
-}
-.setup-notice h3 { font-family: 'Fraunces', serif; font-size: 20px; color: var(--dark); margin-bottom: 12px; }
-.setup-notice code {
-  background: var(--dark); color: var(--orange);
-  padding: 2px 8px; border-radius: 6px; font-size: 13px;
-}
-.setup-notice pre {
-  background: var(--dark); color: #aaa; padding: 16px; border-radius: 10px;
-  font-size: 12px; overflow-x: auto; margin: 12px 0; line-height: 1.6;
-}
-.setup-notice pre .highlight { color: var(--orange); }
+/* LOADER */
+.loader{display:flex;justify-content:center;padding:40px}
+.spinner{width:36px;height:36px;border:3px solid var(--warm);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}.empty-state .icon{font-size:64px;margin-bottom:16px}
 
 /* UTILS */
-.flex { display: flex; }
-.gap-8 { gap: 8px; }
-.mt-12 { margin-top: 12px; }
-.text-center { text-align: center; }
-.btn-sm { padding: 8px 16px; font-size: 13px; }
-.btn-danger { background: var(--red); color: white; }
-.btn-danger:hover { filter: brightness(1.1); }
-.btn-green { background: var(--green); color: white; }
-.btn-green:hover { filter: brightness(1.1); }
-.btn-purple { background: var(--kids-purple); color: white; }
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mb-8{margin-bottom:8px}.mb-16{margin-bottom:16px}
+.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.flex-wrap{flex-wrap:wrap}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-danger{background:var(--red);color:white}.btn-danger:hover{filter:brightness(1.1)}
+.btn-green{background:var(--green);color:white}.btn-green:hover{filter:brightness(1.1)}
+.btn-purple{background:var(--kids-purple);color:white}
+.btn-full{width:100%}
+.text-center{text-align:center}
+.text-muted{color:var(--muted)}
+.text-sm{font-size:13px}
+.relative{position:relative}
+.config-banner{background:linear-gradient(135deg,#FFF3E0,#FFF8E7);border:2px solid var(--orange);border-radius:16px;padding:24px;margin:80px 20px 20px;max-width:760px;margin-left:auto;margin-right:auto}
+.config-banner h3{font-family:'Fraunces',serif;font-size:20px;color:var(--dark);margin-bottom:12px}
+.config-banner code{background:var(--dark);color:var(--orange);padding:2px 8px;border-radius:6px;font-size:12px}
+.config-banner pre{background:var(--dark);color:#aaa;padding:16px;border-radius:10px;font-size:11px;overflow-x:auto;margin:12px 0;line-height:1.7;white-space:pre-wrap}
+.config-banner pre .h{color:var(--orange)}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     NAVBAR
-══════════════════════════════════════ -->
+<!-- ══════════ NAVBAR ══════════ -->
 <nav class="navbar" id="main-navbar">
-  <div class="nav-logo" onclick="goHome()">
-    <span>🐱</span> tifapng
-  </div>
-  <div class="nav-links" id="nav-links">
-    <button class="nav-btn ghost" onclick="showPage('feed')" id="btn-nav-feed" style="display:none">Accueil</button>
-    <button class="nav-btn ghost" onclick="showPage('profile')" id="btn-nav-profile" style="display:none">Mon profil</button>
-    <button class="nav-btn kids" onclick="showPage('kids')">🌸 KIDS</button>
-    <button class="nav-btn ghost" onclick="showModal('login')" id="btn-login">Connexion</button>
-    <button class="nav-btn primary" onclick="showModal('register')" id="btn-register">S'inscrire</button>
+  <div class="nav-logo" onclick="goHome()">🐱 tifapng</div>
+  <div class="nav-links">
+    <button class="nav-btn ghost" id="btn-feed"    onclick="showPage('feed')"    style="display:none">🏠 Accueil</button>
+    <button class="nav-btn ghost" id="btn-profile" onclick="showPage('profile')" style="display:none">Mon profil</button>
+    <button class="nav-btn kids"                   onclick="showPage('kids')">🌸 KIDS</button>
+    <button class="nav-btn ghost" id="btn-login"   onclick="showModal('login')">Connexion</button>
+    <button class="nav-btn primary" id="btn-reg"   onclick="showModal('register')">S'inscrire</button>
     <div class="nav-avatar" id="nav-avatar" style="display:none" onclick="showPage('profile')"></div>
-    <button class="nav-btn ghost" onclick="logout()" id="btn-logout" style="display:none">Déconnexion</button>
+    <button class="nav-btn ghost" id="btn-logout"  onclick="logout()" style="display:none">Déconnexion</button>
   </div>
 </nav>
 
-<!-- ══════════════════════════════════════
-     PAGES
-══════════════════════════════════════ -->
-
-<!-- LANDING -->
+<!-- ══════════ LANDING ══════════ -->
 <div id="page-landing" class="page active">
   <div class="hero">
-    <div class="hero-paws">🐾</div>
-    <div class="hero-paws">🐱</div>
-    <div class="hero-paws">🐾</div>
+    <div class="hero-paws">🐾</div><div class="hero-paws">🐱</div><div class="hero-paws">🐾</div>
     <div class="hero-tag">✨ Le réseau social des amoureux de chats</div>
-    <h1 class="hero-title">
-      tifa<span class="accent">png</span><br>
-      <span class="italic">miaou !</span>
-    </h1>
+    <h1 class="hero-title">tifa<span class="accent">png</span><br><span class="italic">miaou !</span></h1>
     <p class="hero-sub">Partagez vos photos de chats avec le monde, vos amis, ou gardez-les juste pour vous. 🐱</p>
     <div class="hero-ctas">
       <button class="btn btn-primary" onclick="showModal('register')">🐾 Rejoindre</button>
       <button class="btn btn-outline" onclick="showPage('feed')">Explorer le feed</button>
-      <button class="btn btn-kids" onclick="showPage('kids')">🌸 Mode KIDS</button>
+      <button class="btn btn-kids"    onclick="showPage('kids')">🌸 Mode KIDS</button>
     </div>
   </div>
   <div class="preview-grid">
-    <div class="preview-card">🐱</div>
-    <div class="preview-card" style="transform:translateY(16px)">😸</div>
-    <div class="preview-card">🐈</div>
-    <div class="preview-card">🐈‍⬛</div>
-    <div class="preview-card" style="transform:translateY(16px)">😻</div>
-    <div class="preview-card">🐾</div>
+    <div class="preview-card">🐱</div><div class="preview-card">😸</div><div class="preview-card">🐈</div>
+    <div class="preview-card">🐈‍⬛</div><div class="preview-card">😻</div><div class="preview-card">🐾</div>
   </div>
+  <div id="config-banner-landing" style="display:none"></div>
 </div>
 
-<!-- FEED -->
+<!-- ══════════ FEED ══════════ -->
 <div id="page-feed" class="page">
   <div class="feed-layout">
-    <!-- Left Sidebar -->
     <aside class="sidebar sidebar-left">
       <div class="sidebar-card">
         <div class="sidebar-title">🏷️ Catégories</div>
         <div id="categories-list">
-          <div class="category-pill active" data-cat="all"><span>🐱</span> Tous</div>
-          <div class="category-pill" data-cat="mignon"><span>😸</span> Mignons</div>
-          <div class="category-pill" data-cat="drole"><span>😂</span> Drôles</div>
-          <div class="category-pill" data-cat="dodo"><span>😴</span> Qui dorment</div>
-          <div class="category-pill" data-cat="chaton"><span>🍼</span> Chatons</div>
-          <div class="category-pill" data-cat="noir"><span>🐈‍⬛</span> Noirs</div>
-          <div class="category-pill" data-cat="roux"><span>🦁</span> Roux</div>
-          <div class="category-pill" data-cat="persan"><span>👑</span> Persans</div>
-          <div class="category-pill" data-cat="siamois"><span>⚡</span> Siamois</div>
+          <div class="category-pill active" data-cat="all">🐱 Tous</div>
+          <div class="category-pill" data-cat="mignon">😸 Mignons</div>
+          <div class="category-pill" data-cat="drole">😂 Drôles</div>
+          <div class="category-pill" data-cat="dodo">😴 Dodo</div>
+          <div class="category-pill" data-cat="chaton">🍼 Chatons</div>
+          <div class="category-pill" data-cat="noir">🐈‍⬛ Noirs</div>
+          <div class="category-pill" data-cat="roux">🦁 Roux</div>
+          <div class="category-pill" data-cat="persan">👑 Persans</div>
+          <div class="category-pill" data-cat="siamois">⚡ Siamois</div>
         </div>
       </div>
-      <div class="sidebar-card" id="profile-mini" style="display:none">
+      <div class="sidebar-card" id="sidebar-me" style="display:none">
         <div class="sidebar-title">👤 Mon compte</div>
         <div style="text-align:center">
-          <div id="sidebar-avatar" style="font-size:48px;margin:8px 0">🐱</div>
-          <div id="sidebar-username" style="font-weight:600;font-size:15px"></div>
-          <button class="btn btn-outline btn-sm mt-12" onclick="showPage('profile')">Voir mon profil</button>
+          <div id="sidebar-avatar" style="font-size:44px;margin:8px 0">🐱</div>
+          <div id="sidebar-username" style="font-weight:600;font-size:15px;margin-bottom:12px"></div>
+          <button class="btn btn-outline btn-sm btn-full" onclick="showPage('profile')">Mon profil</button>
         </div>
       </div>
     </aside>
-
-    <!-- Main Feed -->
     <main>
-      <!-- Publish Box -->
-      <div class="publish-box" id="publish-box" style="display:none">
-        <div class="publish-trigger" onclick="showModal('publish')">
-          <div class="nav-avatar" id="publish-box-avatar">🐱</div>
+      <div class="publish-box" id="publish-box" style="display:none" onclick="showModal('publish')">
+        <div class="publish-trigger">
+          <div class="nav-avatar" id="publish-avatar">🐱</div>
           <div class="fake-input">Partager une photo de ton chat... 📸</div>
-          <button class="btn btn-primary btn-sm">Publier</button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();showModal('publish')">Publier</button>
         </div>
       </div>
       <div id="auth-cta" style="display:none">
@@ -735,275 +297,172 @@ body {
           <button class="btn btn-primary btn-sm" onclick="showModal('login')">Se connecter</button>
         </div>
       </div>
-      <div id="feed-posts">
-        <div class="loader"><div class="spinner"></div></div>
-      </div>
+      <div id="feed-posts"><div class="loader"><div class="spinner"></div></div></div>
     </main>
-
-    <!-- Right Sidebar -->
     <aside class="sidebar sidebar-right">
       <div class="sidebar-card">
         <div class="sidebar-title">🔥 Tendances</div>
         <div style="font-size:13px;color:var(--muted)">
-          <div style="padding:6px 0;cursor:pointer;hover:color:var(--orange)">#chatdodo 😴</div>
-          <div style="padding:6px 0;cursor:pointer">#mainecoon 🦁</div>
-          <div style="padding:6px 0;cursor:pointer">#chaton 🍼</div>
-          <div style="padding:6px 0;cursor:pointer">#chatbizarre 🤔</div>
-          <div style="padding:6px 0;cursor:pointer">#groumf 😾</div>
+          <div style="padding:7px 0;cursor:pointer" onclick="filterCat('dodo')">#chatdodo 😴</div>
+          <div style="padding:7px 0;cursor:pointer" onclick="filterCat('roux')">#roux 🦁</div>
+          <div style="padding:7px 0;cursor:pointer" onclick="filterCat('chaton')">#chaton 🍼</div>
+          <div style="padding:7px 0;cursor:pointer" onclick="filterCat('noir')">#noir 🐈‍⬛</div>
+          <div style="padding:7px 0;cursor:pointer" onclick="filterCat('drole')">#drôle 😂</div>
         </div>
       </div>
       <div class="sidebar-card" style="background:linear-gradient(135deg,var(--kids-pink),var(--kids-purple));color:white">
         <div class="sidebar-title" style="color:white">🌸 tifapng KIDS</div>
-        <p style="font-size:13px;opacity:0.9;margin-bottom:14px">Mode sécurisé pour vos enfants</p>
+        <p style="font-size:13px;opacity:.9;margin-bottom:14px">Mode sécurisé pour vos enfants</p>
         <button class="btn btn-sm" style="background:white;color:var(--kids-purple);width:100%" onclick="showPage('kids')">Découvrir</button>
       </div>
     </aside>
   </div>
 </div>
 
-<!-- PROFILE -->
+<!-- ══════════ PROFILE ══════════ -->
 <div id="page-profile" class="page">
-  <div class="profile-header">
-    <div class="profile-banner">🐱😸🐾🐈</div>
+  <div class="profile-banner">🐱 😸 🐾 🐈 😻 🐱</div>
+  <div class="profile-body">
     <div class="profile-avatar-wrap">
       <div class="profile-avatar" id="profile-avatar-display">🐱</div>
     </div>
-    <h2 class="profile-name" id="profile-name-display">Chargement...</h2>
-    <p class="profile-bio" id="profile-bio-display">Amoureux des chats 🐾</p>
-    <div class="profile-stats">
-      <div class="stat-item">
-        <div class="stat-num" id="profile-posts-count">0</div>
-        <div class="stat-label">publications</div>
+    <div class="profile-info">
+      <div>
+        <h2 class="profile-name" id="profile-name-display">Chargement...</h2>
+        <p class="profile-bio" id="profile-bio-display">Amoureux des chats 🐾</p>
+        <div class="profile-stats">
+          <div class="stat-item"><div class="stat-num" id="profile-posts-count">0</div><div class="stat-label">publications</div></div>
+          <div class="stat-item"><div class="stat-num" id="profile-likes-count">0</div><div class="stat-label">likes reçus</div></div>
+          <div class="stat-item"><div class="stat-num" id="profile-followers-count">0</div><div class="stat-label">abonnés</div></div>
+        </div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num" id="profile-likes-count">0</div>
-        <div class="stat-label">likes reçus</div>
-      </div>
+      <button class="btn btn-outline btn-sm" onclick="showModal('editProfile')">✏️ Modifier le profil</button>
     </div>
-    <button class="btn btn-outline btn-sm" style="margin-bottom:24px" onclick="showModal('editProfile')">✏️ Modifier le profil</button>
-  </div>
-  <div class="profile-grid" id="profile-posts-grid">
-    <div class="loader"><div class="spinner"></div></div>
+    <div class="profile-grid" id="profile-posts-grid">
+      <div class="loader" style="grid-column:1/-1"><div class="spinner"></div></div>
+    </div>
   </div>
 </div>
 
-<!-- KIDS PAGE -->
+<!-- ══════════ KIDS ══════════ -->
 <div id="page-kids" class="page">
   <div class="kids-hero">
     <h1 class="kids-title">tifapng <span class="accent">KIDS</span> 🌸</h1>
-    <p class="kids-sub">Un espace sécurisé pour que vos enfants découvrent les chats adorables !</p>
+    <p class="text-muted mt-8 mb-16">Un espace sécurisé pour que vos enfants découvrent les chats adorables !</p>
     <div class="flex gap-8" style="justify-content:center;flex-wrap:wrap">
       <button class="btn btn-kids" onclick="showModal('kidsLogin')">🔐 Espace parents</button>
-      <button class="btn btn-outline" onclick="showKidsFeed()">🐱 Mode enfant</button>
+      <button class="btn btn-outline" onclick="enterKidMode()">🐱 Mode enfant</button>
     </div>
   </div>
-
-  <div class="kids-features">
-    <div class="kids-feature-card">
-      <div class="kids-feature-icon">⏱️</div>
-      <div class="kids-feature-title">Limite de temps</div>
-      <div class="kids-feature-desc">Définissez un temps d'écran quotidien pour chaque enfant</div>
-    </div>
-    <div class="kids-feature-card">
-      <div class="kids-feature-icon">🔒</div>
-      <div class="kids-feature-title">Chaînes approuvées</div>
-      <div class="kids-feature-desc">Choisissez exactement quels comptes votre enfant peut suivre</div>
-    </div>
-    <div class="kids-feature-card">
-      <div class="kids-feature-icon">🛡️</div>
-      <div class="kids-feature-title">Contenu sécurisé</div>
-      <div class="kids-feature-desc">Seulement les photos taguées "Enfants" sont visibles</div>
-    </div>
-    <div class="kids-feature-card">
-      <div class="kids-feature-icon">📊</div>
-      <div class="kids-feature-title">Rapports</div>
-      <div class="kids-feature-desc">Suivez le temps passé et les interactions de votre enfant</div>
-    </div>
+  <div class="kids-features" id="kids-features">
+    <div class="kids-feature-card"><div class="kids-feature-icon">⏱️</div><div class="kids-feature-title">Limite de temps</div><div class="kids-feature-desc">Définissez un temps d'écran quotidien pour chaque enfant</div></div>
+    <div class="kids-feature-card"><div class="kids-feature-icon">🔒</div><div class="kids-feature-title">Chaînes approuvées</div><div class="kids-feature-desc">Choisissez exactement quels comptes votre enfant peut suivre</div></div>
+    <div class="kids-feature-card"><div class="kids-feature-icon">🛡️</div><div class="kids-feature-title">Contenu sécurisé</div><div class="kids-feature-desc">Uniquement les photos taguées "Enfants" sont visibles</div></div>
+    <div class="kids-feature-card"><div class="kids-feature-icon">📊</div><div class="kids-feature-title">Rapports</div><div class="kids-feature-desc">Suivez le temps passé et les interactions de votre enfant</div></div>
   </div>
-
-  <!-- Parental Dashboard (shown after login) -->
+  <!-- PARENTAL DASHBOARD -->
   <div id="parental-dashboard" style="display:none">
     <div class="parental-dashboard">
-      <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;margin-bottom:24px;text-align:center">
-        🔐 Tableau de bord parental
-      </h2>
-
-      <!-- Children accounts -->
+      <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;margin-bottom:24px;text-align:center">🔐 Tableau de bord parental</h2>
       <div class="dashboard-card">
         <div class="dashboard-card-title">👶 Comptes enfants</div>
-        <div id="children-list">
-          <!-- JS populated -->
-        </div>
+        <div id="children-list"></div>
         <button class="btn btn-kids btn-sm mt-12" onclick="showModal('addChild')">+ Ajouter un enfant</button>
       </div>
-
-      <!-- Time limit -->
-      <div class="dashboard-card" id="selected-child-controls" style="display:none">
-        <div class="dashboard-card-title">⏱️ Limite de temps – <span id="selected-child-name"></span></div>
-        <div class="time-display" id="time-display">60 min / jour</div>
-        <div class="time-slider-wrap">
-          <input type="range" class="time-slider" id="time-slider" min="15" max="240" step="15" value="60" oninput="updateTimeDisplay(this.value)">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px">
-            <span>15 min</span><span>4 heures</span>
-          </div>
+      <div class="dashboard-card" id="child-controls" style="display:none">
+        <div class="dashboard-card-title">⚙️ Paramètres – <span id="selected-child-name"></span></div>
+        <div class="form-group">
+          <div class="form-label">⏱️ Limite de temps quotidienne</div>
+          <div class="time-display" id="time-display">60 min / jour</div>
+          <input type="range" class="time-slider" id="time-slider" min="15" max="240" step="15" value="60" oninput="updateTimeDisplay(this.value)" style="background:linear-gradient(90deg,var(--kids-pink) 30%,var(--warm) 30%)">
+          <div class="flex" style="justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px"><span>15 min</span><span>4h</span></div>
         </div>
-        <button class="btn btn-kids btn-sm mt-12" onclick="saveTimeLimit()">💾 Enregistrer</button>
-      </div>
-
-      <!-- Allowed channels -->
-      <div class="dashboard-card" id="allowed-channels-card" style="display:none">
-        <div class="dashboard-card-title">🔒 Chaînes autorisées</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Cliquer pour autoriser/bloquer un compte</p>
-        <div class="allowed-channels-grid" id="channels-grid">
-          <!-- JS populated -->
+        <div class="form-group">
+          <div class="form-label">🏷️ Catégories autorisées</div>
+          <div id="kids-categories-ctrl" class="flex flex-wrap gap-8" style="margin-top:8px"></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">📺 Chaînes autorisées</div>
+          <div id="channels-grid" class="flex flex-wrap" style="margin-top:8px"></div>
+        </div>
+        <div class="flex gap-8 mt-16">
+          <button class="btn btn-danger btn-sm" onclick="deleteChild()">🗑️ Supprimer l'enfant</button>
+          <button class="btn btn-kids btn-sm" style="margin-left:auto" onclick="saveChildSettings()">💾 Enregistrer</button>
         </div>
       </div>
-
-      <!-- Categories allowed -->
-      <div class="dashboard-card" id="kids-categories-card" style="display:none">
-        <div class="dashboard-card-title">🏷️ Catégories autorisées</div>
-        <div id="kids-categories-list" style="display:flex;flex-wrap:wrap;gap:8px">
-          <!-- JS populated -->
-        </div>
-        <button class="btn btn-kids btn-sm mt-12" onclick="saveCategories()">💾 Enregistrer</button>
-      </div>
-
-      <!-- Usage stats -->
       <div class="dashboard-card">
         <div class="dashboard-card-title">📊 Statistiques aujourd'hui</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
-          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-pink)">23</div><div style="font-size:12px;color:var(--muted)">min utilisées</div></div>
-          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-purple)">12</div><div style="font-size:12px;color:var(--muted)">photos vues</div></div>
-          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-green)">5</div><div style="font-size:12px;color:var(--muted)">likes donnés</div></div>
+        <div id="kids-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-pink)" id="stat-mins">0</div><div style="font-size:12px;color:var(--muted)">min utilisées</div></div>
+          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-purple)" id="stat-views">0</div><div style="font-size:12px;color:var(--muted)">photos vues</div></div>
+          <div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--kids-green)" id="stat-likes">0</div><div style="font-size:12px;color:var(--muted)">likes donnés</div></div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Kids Feed (shown when in kid mode) -->
+  <!-- KIDS FEED -->
   <div id="kids-feed-view" style="display:none">
-    <div style="max-width:600px;margin:0 auto;padding:20px">
-      <div style="text-align:center;margin-bottom:24px">
-        <span style="font-size:48px">🐱</span>
-        <h2 style="font-family:'Fraunces',serif;font-size:28px;color:var(--kids-pink)">Bonjour !</h2>
-        <p style="color:var(--muted);font-size:14px">Voici les photos de chats du jour 🐾</p>
+    <div class="kids-feed-wrap">
+      <div class="kids-timer-bar">
+        <span>🕐 Temps restant aujourd'hui</span>
+        <span id="kids-timer-display">60 min</span>
       </div>
-      <div id="kids-posts">
-        <div class="loader"><div class="spinner"></div></div>
+      <div id="kids-posts"><div class="loader"><div class="spinner"></div></div></div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn btn-outline btn-sm" onclick="exitKidMode()">← Retour</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- LOGIN PAGE -->
-<div id="page-login" class="page">
-  <div class="auth-card">
-    <div class="auth-logo">🐱 tifapng</div>
-    <h2 style="font-family:'Fraunces',serif;font-size:22px;text-align:center;margin-bottom:24px">Bon retour !</h2>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="login-email" placeholder="miaou@chat.fr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="login-password" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" style="width:100%" onclick="login()">Se connecter 🐾</button>
-    <div class="auth-switch">
-      Pas encore de compte ? <a onclick="showPage('register')">S'inscrire</a>
-    </div>
-  </div>
-</div>
+<!-- ══════════ MODALS ══════════ -->
 
-<!-- REGISTER PAGE -->
-<div id="page-register" class="page">
-  <div class="auth-card">
-    <div class="auth-logo">🐱 tifapng</div>
-    <h2 style="font-family:'Fraunces',serif;font-size:22px;text-align:center;margin-bottom:24px">Rejoindre tifapng</h2>
-    <div class="form-group">
-      <label class="form-label">Nom d'utilisateur</label>
-      <input type="text" class="form-input" id="register-username" placeholder="chatmaster42">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="register-email" placeholder="miaou@chat.fr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="register-password" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="register()">Créer mon compte 🐱</button>
-    <div class="auth-switch">
-      Déjà un compte ? <a onclick="showPage('login')">Se connecter</a>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     MODALS
-══════════════════════════════════════ -->
-
-<!-- Login Modal -->
+<!-- LOGIN -->
 <div class="modal-overlay" id="modal-login">
   <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">✕</button>
     <div class="modal-title">Connexion à <span class="accent">tifapng</span></div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="m-login-email" placeholder="miaou@chat.fr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="m-login-password" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" style="width:100%" onclick="login()">Se connecter 🐾</button>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="m-login-email" placeholder="miaou@chat.fr" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="form-group"><label class="form-label">Mot de passe</label><input type="password" class="form-input" id="m-login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="btn btn-primary btn-full mt-8" onclick="login()">Se connecter 🐾</button>
     <div class="divider"><span>ou</span></div>
-    <button class="btn btn-outline" style="width:100%" onclick="closeModal('login');showModal('register')">Créer un compte</button>
-    <button onclick="closeModal('login')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+    <button class="btn btn-outline btn-full" onclick="closeModal('login');showModal('register')">Créer un compte</button>
   </div>
 </div>
 
-<!-- Register Modal -->
+<!-- REGISTER -->
 <div class="modal-overlay" id="modal-register">
   <div class="modal">
+    <button class="modal-close" onclick="closeModal('register')">✕</button>
     <div class="modal-title">Rejoindre <span class="accent">tifapng</span></div>
-    <div class="form-group">
-      <label class="form-label">Nom d'utilisateur</label>
-      <input type="text" class="form-input" id="m-reg-username" placeholder="chatmaster42">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="m-reg-email" placeholder="miaou@chat.fr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="m-reg-password" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="register()">Créer mon compte 🐱</button>
-    <button onclick="closeModal('register')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+    <div class="form-group"><label class="form-label">Nom d'utilisateur</label><input type="text" class="form-input" id="m-reg-user" placeholder="chatmaster42"></div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="m-reg-email" placeholder="miaou@chat.fr"></div>
+    <div class="form-group"><label class="form-label">Mot de passe</label><input type="password" class="form-input" id="m-reg-pw" placeholder="••••••••"></div>
+    <button class="btn btn-primary btn-full mt-8" onclick="register()">Créer mon compte 🐱</button>
+    <div class="auth-switch mt-12">Déjà un compte ? <a onclick="closeModal('register');showModal('login')">Se connecter</a></div>
   </div>
 </div>
 
-<!-- Publish Modal -->
+<!-- PUBLISH -->
 <div class="modal-overlay" id="modal-publish">
   <div class="modal" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('publish')">✕</button>
     <div class="modal-title">📸 Nouvelle publication</div>
     <div class="form-group">
-      <label class="form-label">Titre de la photo</label>
+      <label class="form-label">Titre</label>
       <input type="text" class="form-input" id="pub-title" placeholder="Mon chat fait la sieste... encore 😴">
     </div>
     <div class="form-group">
-      <label class="form-label">Photo de chat</label>
-      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo-file').click()">
-        <div>📸</div>
-        <div style="font-weight:600;margin:8px 0">Cliquer pour choisir une photo</div>
-        <div style="font-size:12px;color:var(--muted)">ou URL d'image ci-dessous</div>
+      <label class="form-label">Photo</label>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo-input').click()" ondragover="onDragOver(event)" ondrop="onDrop(event)">
+        <div class="upload-icon">📸</div>
+        <div style="font-weight:600;margin:4px 0">Cliquer ou glisser-déposer</div>
+        <div style="font-size:12px;color:var(--muted)">JPG, PNG, GIF, WEBP — max 10 Mo</div>
+        <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
       </div>
-      <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
-      <img id="upload-preview" class="upload-preview" style="display:none">
-    </div>
-    <div class="form-group">
-      <label class="form-label">URL d'image (alternative)</label>
-      <input type="url" class="form-input" id="pub-image-url" placeholder="https://..." oninput="previewURL(this.value)">
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handleFile(event)">
+      <img id="upload-preview" class="upload-preview">
+      <div id="upload-filename" style="font-size:12px;color:var(--green);margin-top:6px;display:none"></div>
     </div>
     <div class="form-group">
       <label class="form-label">Description</label>
@@ -1011,10 +470,10 @@ body {
     </div>
     <div class="form-group">
       <label class="form-label">Catégorie</label>
-      <select class="form-select" id="pub-category">
+      <select class="form-select" id="pub-cat">
         <option value="mignon">😸 Mignons</option>
         <option value="drole">😂 Drôles</option>
-        <option value="dodo">😴 Qui dorment</option>
+        <option value="dodo">😴 Dodo</option>
         <option value="chaton">🍼 Chatons</option>
         <option value="noir">🐈‍⬛ Noirs</option>
         <option value="roux">🦁 Roux</option>
@@ -1025,717 +484,644 @@ body {
     <div class="form-group">
       <label class="form-label">Qui peut voir cette photo ?</label>
       <div class="privacy-selector">
-        <div class="privacy-option selected" data-privacy="public" onclick="selectPrivacy(this)">🌍 Public</div>
-        <div class="privacy-option" data-privacy="kids" onclick="selectPrivacy(this)">🧒 Enfants</div>
-        <div class="privacy-option" data-privacy="friends" onclick="selectPrivacy(this)">👥 Amis</div>
-        <div class="privacy-option" data-privacy="friends_except" onclick="selectPrivacy(this)">👥 Amis sauf...</div>
-        <div class="privacy-option" data-privacy="private" onclick="selectPrivacy(this)">🔒 Privée</div>
+        <div class="privacy-option selected" data-p="public">🌍 Public</div>
+        <div class="privacy-option" data-p="kids">🧒 Enfants</div>
+        <div class="privacy-option" data-p="friends">👥 Amis</div>
+        <div class="privacy-option" data-p="friends_except">👥 Amis sauf...</div>
+        <div class="privacy-option" data-p="private">🔒 Privée</div>
       </div>
-      <div class="friends-except-input" id="friends-except-wrap">
-        <label class="form-label mt-12">Exclure ces personnes :</label>
+      <div class="friends-except-input" id="except-wrap">
+        <label class="form-label mt-12">Exclure :</label>
         <div class="tag-input-wrap" id="except-tags" onclick="document.getElementById('except-input').focus()">
-          <input type="text" id="except-input" placeholder="Nom d'utilisateur..." style="border:none;background:transparent;outline:none;font-size:13px;min-width:120px" onkeydown="addExceptTag(event)">
+          <input type="text" id="except-input" placeholder="@pseudo... (Entrée)" style="border:none;background:transparent;outline:none;font-size:13px;min-width:120px;flex:1" onkeydown="addExceptTag(event)">
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:12px;margin-top:8px">
+    <div class="flex gap-12 mt-16">
       <button class="btn btn-outline" style="flex:1" onclick="closeModal('publish')">Annuler</button>
-      <button class="btn btn-primary" style="flex:1" onclick="publishPost()">Publier 🐱</button>
+      <button class="btn btn-primary" style="flex:1" id="publish-btn" onclick="publishPost()">Publier 🐱</button>
     </div>
-    <button onclick="closeModal('publish')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
   </div>
 </div>
 
-<!-- Edit Profile Modal -->
+<!-- EDIT PROFILE -->
 <div class="modal-overlay" id="modal-editProfile">
   <div class="modal">
-    <div class="modal-title">✏️ Modifier mon profil</div>
+    <button class="modal-close" onclick="closeModal('editProfile')">✕</button>
+    <div class="modal-title">✏️ Mon profil</div>
     <div class="form-group">
-      <label class="form-label">Nom d'utilisateur</label>
-      <input type="text" class="form-input" id="edit-username" placeholder="chatmaster42">
+      <label class="form-label">Avatar</label>
+      <div class="upload-zone" id="avatar-zone" onclick="document.getElementById('avatar-input').click()">
+        <div id="avatar-preview-wrap" style="font-size:48px;margin:4px 0">🐱</div>
+        <div style="font-size:12px;color:var(--muted)">Cliquer pour changer</div>
+      </div>
+      <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarFile(event)">
     </div>
+    <div class="form-group"><label class="form-label">Nom d'utilisateur</label><input type="text" class="form-input" id="edit-username" placeholder="chatmaster42"></div>
+    <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="edit-bio" placeholder="Amoureux des chats 🐾..."></textarea></div>
     <div class="form-group">
-      <label class="form-label">Bio</label>
-      <textarea class="form-textarea" id="edit-bio" placeholder="Amoureux des chats 🐾..."></textarea>
+      <label class="form-label">Code parental KIDS (4 chiffres)</label>
+      <input type="password" class="form-input" id="edit-pin" placeholder="••••" maxlength="4" style="letter-spacing:8px;text-align:center;font-size:20px">
+      <div class="text-sm text-muted mt-8">Définissez ce code pour accéder à l'espace parental</div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Photo de profil (URL)</label>
-      <input type="url" class="form-input" id="edit-avatar" placeholder="https://...">
-    </div>
-    <div style="display:flex;gap:12px;margin-top:8px">
+    <div class="flex gap-12 mt-8">
       <button class="btn btn-outline" style="flex:1" onclick="closeModal('editProfile')">Annuler</button>
       <button class="btn btn-primary" style="flex:1" onclick="saveProfile()">Enregistrer 💾</button>
     </div>
-    <button onclick="closeModal('editProfile')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
   </div>
 </div>
 
-<!-- Kids Parent Login Modal -->
+<!-- KIDS LOGIN -->
 <div class="modal-overlay" id="modal-kidsLogin">
   <div class="modal">
-    <div class="modal-title">🔐 Espace <span class="accent" style="color:var(--kids-pink)">parents</span></div>
-    <p style="text-align:center;color:var(--muted);font-size:14px;margin-bottom:24px">Connectez-vous avec votre compte tifapng pour accéder au tableau de bord parental.</p>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="kids-parent-email" placeholder="parent@famille.fr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Code parental (4 chiffres)</label>
-      <input type="password" class="form-input" id="kids-parent-pin" placeholder="••••" maxlength="4" style="letter-spacing:8px;font-size:20px;text-align:center">
-    </div>
-    <button class="btn btn-kids" style="width:100%" onclick="kidsParentLogin()">Accéder au dashboard 🌸</button>
-    <button onclick="closeModal('kidsLogin')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+    <button class="modal-close" onclick="closeModal('kidsLogin')">✕</button>
+    <div class="modal-title">🔐 Espace <span style="color:var(--kids-pink)">parents</span></div>
+    <p class="text-center text-muted text-sm mb-16">Connectez-vous et saisissez votre code parental pour gérer les comptes enfants.</p>
+    <div class="form-group"><label class="form-label">Email du compte parent</label><input type="email" class="form-input" id="kp-email" placeholder="parent@famille.fr"></div>
+    <div class="form-group"><label class="form-label">Mot de passe</label><input type="password" class="form-input" id="kp-pw" placeholder="••••••••"></div>
+    <div class="form-group"><label class="form-label">Code parental (4 chiffres)</label><input type="password" class="form-input" id="kp-pin" placeholder="••••" maxlength="4" style="letter-spacing:8px;text-align:center;font-size:20px"></div>
+    <button class="btn btn-kids btn-full" onclick="kidsParentLogin()">Accéder au dashboard 🌸</button>
   </div>
 </div>
 
-<!-- Add Child Modal -->
+<!-- ADD CHILD -->
 <div class="modal-overlay" id="modal-addChild">
   <div class="modal">
-    <div class="modal-title">👶 Ajouter un <span class="accent" style="color:var(--kids-pink)">enfant</span></div>
-    <div class="form-group">
-      <label class="form-label">Prénom de l'enfant</label>
-      <input type="text" class="form-input" id="child-name" placeholder="Léa">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Âge</label>
-      <input type="number" class="form-input" id="child-age" placeholder="8" min="3" max="17">
-    </div>
+    <button class="modal-close" onclick="closeModal('addChild')">✕</button>
+    <div class="modal-title">👶 Ajouter un <span style="color:var(--kids-pink)">enfant</span></div>
+    <div class="form-group"><label class="form-label">Prénom</label><input type="text" class="form-input" id="new-child-name" placeholder="Léa"></div>
+    <div class="form-group"><label class="form-label">Âge</label><input type="number" class="form-input" id="new-child-age" placeholder="8" min="1" max="17"></div>
     <div class="form-group">
       <label class="form-label">Avatar</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <span class="category-pill" onclick="selectChildAvatar(this,'🐱')">🐱</span>
-        <span class="category-pill" onclick="selectChildAvatar(this,'😸')">😸</span>
-        <span class="category-pill" onclick="selectChildAvatar(this,'🐈')">🐈</span>
-        <span class="category-pill" onclick="selectChildAvatar(this,'🐈‍⬛')">🐈‍⬛</span>
-        <span class="category-pill" onclick="selectChildAvatar(this,'😻')">😻</span>
-        <span class="category-pill" onclick="selectChildAvatar(this,'🌸')">🌸</span>
+      <div class="flex flex-wrap gap-8">
+        <span class="category-pill active" onclick="pickAvatar(this,'🐱')">🐱</span>
+        <span class="category-pill" onclick="pickAvatar(this,'😸')">😸</span>
+        <span class="category-pill" onclick="pickAvatar(this,'🐈')">🐈</span>
+        <span class="category-pill" onclick="pickAvatar(this,'🐈‍⬛')">🐈‍⬛</span>
+        <span class="category-pill" onclick="pickAvatar(this,'😻')">😻</span>
+        <span class="category-pill" onclick="pickAvatar(this,'🌸')">🌸</span>
       </div>
-      <input type="hidden" id="child-avatar" value="🐱">
+      <input type="hidden" id="new-child-avatar" value="🐱">
     </div>
-    <div style="display:flex;gap:12px;margin-top:8px">
+    <div class="flex gap-12 mt-16">
       <button class="btn btn-outline" style="flex:1" onclick="closeModal('addChild')">Annuler</button>
       <button class="btn btn-kids" style="flex:1" onclick="addChild()">Ajouter 🌸</button>
     </div>
-    <button onclick="closeModal('addChild')" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
   </div>
 </div>
 
-<!-- Post Detail Modal -->
+<!-- POST DETAIL -->
 <div class="modal-overlay" id="modal-post">
   <div class="modal" style="max-width:640px;padding:0;overflow:hidden">
+    <button class="modal-close" style="background:rgba(0,0,0,.5);color:white;z-index:10;top:12px;right:12px" onclick="closeModal('post')">✕</button>
     <div id="modal-post-content"></div>
-    <button onclick="closeModal('post')" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;z-index:10">✕</button>
   </div>
 </div>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<!-- SUPABASE SETUP NOTICE (shown when not configured) -->
-<div id="supabase-setup-notice" class="setup-notice" style="display:none">
+<!-- CONFIG BANNER (shown if not configured) -->
+<div id="config-banner" style="display:none" class="config-banner">
   <h3>⚙️ Configuration Supabase requise</h3>
-  <p style="margin-bottom:12px;font-size:14px;color:var(--muted)">Pour utiliser tifapng, configurez votre projet Supabase :</p>
-  <p style="font-size:13px;margin-bottom:8px"><strong>1.</strong> Créez un projet sur <a href="https://supabase.com" target="_blank" style="color:var(--orange)">supabase.com</a></p>
-  <p style="font-size:13px;margin-bottom:8px"><strong>2.</strong> Remplacez les valeurs dans le code :</p>
-  <pre><code>const SUPABASE_URL = '<span class="highlight">https://VOTRE-PROJET.supabase.co</span>';
-const SUPABASE_ANON_KEY = '<span class="highlight">VOTRE-ANON-KEY</span>';</code></pre>
-  <p style="font-size:13px;margin-bottom:8px"><strong>3.</strong> Exécutez ce SQL dans Supabase :</p>
-  <pre>-- Profils utilisateurs
-CREATE TABLE profiles (
-  id UUID REFERENCES auth.users PRIMARY KEY,
-  username TEXT UNIQUE,
-  bio TEXT,
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Publications
-CREATE TABLE posts (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  image_url TEXT,
-  category TEXT DEFAULT 'mignon',
-  privacy TEXT DEFAULT 'public',
-  except_users TEXT[],
-  likes_count INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Likes
-CREATE TABLE likes (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  post_id UUID REFERENCES posts NOT NULL,
-  user_id UUID REFERENCES auth.users NOT NULL,
-  UNIQUE(post_id, user_id)
-);
-
--- Commentaires
-CREATE TABLE comments (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  post_id UUID REFERENCES posts NOT NULL,
-  user_id UUID REFERENCES auth.users NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Comptes enfants (KIDS)
-CREATE TABLE children (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  parent_id UUID REFERENCES auth.users NOT NULL,
-  name TEXT NOT NULL,
-  age INT,
-  avatar TEXT DEFAULT '🐱',
-  time_limit_minutes INT DEFAULT 60,
-  allowed_categories TEXT[],
-  allowed_channels UUID[],
-  is_active BOOLEAN DEFAULT true
-);
-
--- RLS Policies (activer RLS sur chaque table)
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE likes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE children ENABLE ROW LEVEL SECURITY;
-
--- Policies simplifiées
-CREATE POLICY "Public profiles" ON profiles FOR SELECT USING (true);
-CREATE POLICY "Own profile" ON profiles FOR ALL USING (auth.uid() = id);
-CREATE POLICY "Public posts" ON posts FOR SELECT USING (privacy = 'public' OR privacy = 'kids' OR user_id = auth.uid());
-CREATE POLICY "Own posts" ON posts FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Own posts update" ON posts FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Own posts delete" ON posts FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Likes read" ON likes FOR SELECT USING (true);
-CREATE POLICY "Likes write" ON likes FOR ALL USING (auth.uid() = user_id);
-CREATE POLICY "Comments read" ON comments FOR SELECT USING (true);
-CREATE POLICY "Comments write" ON comments FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Children own" ON children FOR ALL USING (auth.uid() = parent_id);</pre>
-  <p style="font-size:13px"><strong>4.</strong> Activez le Storage dans Supabase et créez un bucket <code>cat-photos</code> en Public.</p>
+  <p style="font-size:14px;color:var(--muted);margin-bottom:12px">Ouvrez le fichier HTML et remplacez ces deux lignes au début du script :</p>
+  <pre><span class="h">const SUPABASE_URL</span> = '<span class="h">https://XXXX.supabase.co</span>';
+<span class="h">const SUPABASE_ANON_KEY</span> = '<span class="h">eyJhbGci...</span>';</pre>
+  <p style="font-size:13px">Puis exécutez <code>tifapng_setup.sql</code> dans l'éditeur SQL de votre projet Supabase.</p>
 </div>
 
 <script>
-// ════════════════════════════════════════
-// CONFIGURATION SUPABASE
-// → Remplacez par vos vraies valeurs !
-// ════════════════════════════════════════
-const SUPABASE_URL = 'https://xlpcjuucnmajkixbyfol.supabase.co';
+// ════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION  — Remplacez ces deux valeurs !
+// ════════════════════════════════════════════════════
+const SUPABASE_URL     = 'https://xlpcjuucnmajkixbyfol.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhscGNqdXVjbm1hamtpeGJ5Zm9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzU0MDgsImV4cCI6MjA5MTkxMTQwOH0.-kuRLm9nCTBu2em74GyltQnkjYSuhfQhcG1HC_Tlu34';
+// ════════════════════════════════════════════════════
 
-// ────────────────────────────────────────
-let supabase, currentUser, currentProfile;
+let sb, currentUser, currentProfile;
 let selectedPrivacy = 'public';
 let exceptUsers = [];
-let selectedChildAvatar_val = '🐱';
-let selectedChildId = null;
-let kidsParentAuthed = false;
-let children = [];
+let pickedFile = null;        // File object to upload
+let pickedAvatarFile = null;
 let currentCategory = 'all';
-let localPosts = []; // fallback demo data
+let selectedChildId = null;
+let children = [];
+let kidsAuthed = false;
+let kidsModeActive = false;
+const IS_CONFIGURED = !SUPABASE_URL.includes('VOTRE-PROJET');
 
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
-function initSupabase() {
-  try {
-    const { createClient } = window.supabase;
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    return true;
-  } catch(e) {
-    return false;
-  }
-}
-
-window.addEventListener('DOMContentLoaded', async () => {
-  const ok = initSupabase();
-  if (!ok || SUPABASE_URL.includes('VOTRE-PROJET')) {
-    document.getElementById('supabase-setup-notice').style.display = 'block';
+// ───────────────── INIT ─────────────────
+async function init() {
+  if (!IS_CONFIGURED) {
+    document.getElementById('config-banner').style.display = 'block';
+    // insert also in landing
+    const lb = document.getElementById('config-banner-landing');
+    lb.style.display = 'block';
+    lb.innerHTML = document.getElementById('config-banner').innerHTML;
+    lb.className = 'config-banner';
     loadDemoData();
+    updateAuthUI();
     return;
   }
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
-      await loadProfile();
-      updateAuthUI();
-    }
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        currentUser = session.user;
-        await loadProfile();
-      } else {
-        currentUser = null;
-        currentProfile = null;
-      }
-      updateAuthUI();
-    });
-  } catch(e) {
-    console.error(e);
-    loadDemoData();
-  }
-});
+  const { createClient } = supabase;
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ════════════════════════════════════════
-// DEMO DATA (no Supabase)
-// ════════════════════════════════════════
-function loadDemoData() {
-  localPosts = [
-    { id: '1', title: 'Milo fait la sieste 😴', description: 'Mon chat passe 18h par jour à dormir...', image_url: 'https://placecats.com/400/300', category: 'dodo', privacy: 'public', likes_count: 47, profiles: { username: 'chatlover', avatar_url: null }, created_at: new Date().toISOString(), comments: [{content:'Trop mignon !', profiles:{username:'felix'}}] },
-    { id: '2', title: 'Luna chasseuse 🎯', description: 'Elle a attrapé une plume imaginaire', image_url: 'https://placecats.com/401/301', category: 'drole', privacy: 'public', likes_count: 82, profiles: { username: 'felinophile', avatar_url: null }, created_at: new Date().toISOString(), comments: [] },
-    { id: '3', title: 'Chaton du refuge 🏠', description: 'Il cherche une famille !', image_url: 'https://placecats.com/402/302', category: 'chaton', privacy: 'kids', likes_count: 134, profiles: { username: 'refuge13', avatar_url: null }, created_at: new Date().toISOString(), comments: [{content:'Oh je le veux !!', profiles:{username:'petite_marie'}}] },
-    { id: '4', title: 'Minuit le noir 🖤', description: 'Impossible de le photographier dans le noir 😂', image_url: 'https://placecats.com/403/303', category: 'noir', privacy: 'public', likes_count: 59, profiles: { username: 'noctambule', avatar_url: null }, created_at: new Date().toISOString(), comments: [] },
-  ];
-  renderPosts(localPosts);
+  // session check
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) { currentUser = session.user; await fetchProfile(); }
+  updateAuthUI();
+
+  sb.auth.onAuthStateChange(async (_event, session) => {
+    if (session?.user) { currentUser = session.user; await fetchProfile(); }
+    else { currentUser = null; currentProfile = null; }
+    updateAuthUI();
+  });
 }
 
-// ════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════
+// ───────────────── AUTH ─────────────────
 async function login() {
-  const email = (document.getElementById('m-login-email') || document.getElementById('login-email')).value;
-  const password = (document.getElementById('m-login-password') || document.getElementById('login-password')).value;
-  if (!email || !password) return toast('Veuillez remplir tous les champs', 'error');
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    closeModal('login');
-    toast('Bienvenue ! 🐱', 'success');
-    showPage('feed');
-  } catch(e) {
-    toast(e.message || 'Erreur de connexion', 'error');
-  }
+  const email = v('m-login-email'), pw = v('m-login-pw');
+  if (!email || !pw) return toast('Remplissez tous les champs','error');
+  setLoading('btn-login-modal', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+  setLoading('btn-login-modal', false);
+  if (error) return toast(error.message,'error');
+  closeModal('login');
+  toast('Bienvenue ! 🐱','success');
+  showPage('feed');
 }
 
 async function register() {
-  const username = (document.getElementById('m-reg-username') || document.getElementById('register-username')).value;
-  const email = (document.getElementById('m-reg-email') || document.getElementById('register-email')).value;
-  const password = (document.getElementById('m-reg-password') || document.getElementById('register-password')).value;
-  if (!username || !email || !password) return toast('Veuillez remplir tous les champs', 'error');
-  try {
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { username } } });
-    if (error) throw error;
-    // Create profile
-    await supabase.from('profiles').upsert({ id: data.user.id, username, bio: 'Amoureux des chats 🐾' });
-    closeModal('register');
-    toast('Compte créé ! Vérifiez votre email 📧', 'success');
-  } catch(e) {
-    toast(e.message || 'Erreur inscription', 'error');
-  }
+  const username = v('m-reg-user'), email = v('m-reg-email'), pw = v('m-reg-pw');
+  if (!username || !email || !pw) return toast('Remplissez tous les champs','error');
+  if (pw.length < 6) return toast('Mot de passe trop court (6 min)','error');
+  const { data, error } = await sb.auth.signUp({ email, password: pw, options: { data: { username } } });
+  if (error) return toast(error.message,'error');
+  closeModal('register');
+  toast('Compte créé ! Vérifiez votre email 📧','success');
 }
 
 async function logout() {
-  if (supabase) await supabase.auth.signOut();
-  currentUser = null;
-  currentProfile = null;
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
   updateAuthUI();
   showPage('landing');
-  toast('À bientôt ! 👋', 'info');
+  toast('À bientôt ! 👋','info');
 }
 
-async function loadProfile() {
-  if (!currentUser || !supabase) return;
-  const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+async function fetchProfile() {
+  if (!currentUser || !sb) return;
+  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
 }
 
 function updateAuthUI() {
-  const loggedIn = !!currentUser;
-  ['btn-login','btn-register'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = loggedIn ? 'none' : '';
-  });
-  ['btn-logout','btn-nav-feed','btn-nav-profile','nav-avatar'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = loggedIn ? '' : 'none';
-  });
-  const avatar = document.getElementById('nav-avatar');
-  if (avatar && currentProfile) {
-    if (currentProfile.avatar_url) {
-      avatar.innerHTML = `<img src="${currentProfile.avatar_url}" alt="">`;
-    } else {
-      avatar.textContent = (currentProfile.username || 'U')[0].toUpperCase();
-    }
-  }
-  const publishBox = document.getElementById('publish-box');
-  const authCta = document.getElementById('auth-cta');
-  if (publishBox) publishBox.style.display = loggedIn ? '' : 'none';
-  if (authCta) authCta.style.display = loggedIn ? 'none' : '';
-  const profileMini = document.getElementById('profile-mini');
-  if (profileMini) profileMini.style.display = loggedIn ? '' : 'none';
-  if (currentProfile) {
-    const sbu = document.getElementById('sidebar-username');
-    if (sbu) sbu.textContent = currentProfile.username || '';
+  const logged = !!currentUser;
+  el('btn-login').style.display  = logged ? 'none' : '';
+  el('btn-reg').style.display    = logged ? 'none' : '';
+  el('btn-logout').style.display = logged ? '' : 'none';
+  el('btn-feed').style.display   = logged ? '' : 'none';
+  el('btn-profile').style.display = logged ? '' : 'none';
+  el('nav-avatar').style.display = logged ? '' : 'none';
+  el('publish-box').style.display = logged ? '' : 'none';
+  el('auth-cta').style.display   = logged ? 'none' : '';
+  el('sidebar-me').style.display = logged ? '' : 'none';
+
+  if (logged && currentProfile) {
+    const initials = (currentProfile.username || 'U')[0].toUpperCase();
+    const avatarHTML = currentProfile.avatar_url
+      ? `<img src="${currentProfile.avatar_url}" alt="">`
+      : initials;
+    el('nav-avatar').innerHTML = avatarHTML;
+    el('sidebar-avatar').innerHTML = currentProfile.avatar_url ? `<img src="${currentProfile.avatar_url}" style="width:48px;height:48px;border-radius:50%;object-fit:cover">` : '🐱';
+    el('sidebar-username').textContent = currentProfile.username || '';
+    el('publish-avatar').innerHTML = avatarHTML;
+    el('avatar-preview-wrap').innerHTML = currentProfile.avatar_url ? `<img src="${currentProfile.avatar_url}" style="width:64px;height:64px;border-radius:50%;object-fit:cover">` : initials;
   }
 }
 
-// ════════════════════════════════════════
-// POSTS / FEED
-// ════════════════════════════════════════
-async function loadFeed(category = 'all') {
-  const container = document.getElementById('feed-posts');
+// ───────────────── FEED ─────────────────
+async function loadFeed(cat = 'all') {
+  const container = el('feed-posts');
   container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
-  if (!supabase || SUPABASE_URL.includes('VOTRE-PROJET')) {
-    let posts = localPosts;
-    if (category !== 'all') posts = posts.filter(p => p.category === category);
-    renderPosts(posts);
-    return;
-  }
+
+  if (!IS_CONFIGURED) { renderPosts(demoData.filter(p => cat === 'all' || p.category === cat)); return; }
+
   try {
-    let query = supabase.from('posts').select(`*, profiles(username, avatar_url), comments(id, content, profiles(username))`).or('privacy.eq.public').order('created_at', { ascending: false }).limit(20);
-    if (category !== 'all') query = query.eq('category', category);
-    const { data, error } = await query;
+    let q = sb.from('posts')
+      .select('id,title,description,image_url,category,privacy,except_users,likes_count,comments_count,created_at,user_id, profiles(username,avatar_url)')
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (cat !== 'all') q = q.eq('category', cat);
+    const { data, error } = await q;
     if (error) throw error;
-    renderPosts(data || []);
+
+    // Filter by privacy client-side for advanced rules
+    const visible = (data || []).filter(p => {
+      if (p.privacy === 'public' || p.privacy === 'kids') return true;
+      if (!currentUser) return false;
+      if (p.user_id === currentUser.id) return true;
+      if (p.privacy === 'friends') return true;
+      if (p.privacy === 'friends_except') {
+        const exc = p.except_users || [];
+        return !exc.includes(currentUser.id) && !exc.includes(currentProfile?.username);
+      }
+      if (p.privacy === 'private') return false;
+      return false;
+    });
+
+    // Fetch liked status for current user
+    if (currentUser) {
+      const postIds = visible.map(p => p.id);
+      const { data: likedData } = await sb.from('likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
+      const likedSet = new Set((likedData || []).map(l => l.post_id));
+      visible.forEach(p => { p._liked = likedSet.has(p.id); });
+    }
+    renderPosts(visible);
   } catch(e) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">😿</div><p>Impossible de charger le feed</p></div>';
+    container.innerHTML = `<div class="empty-state"><div class="icon">😿</div><p>Erreur : ${e.message}</p></div>`;
   }
 }
 
 function renderPosts(posts) {
-  const container = document.getElementById('feed-posts');
-  if (!posts || !posts.length) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">🐱</div><p>Aucune photo de chat pour l\'instant... Soyez le premier à publier !</p></div>';
-    return;
+  const c = el('feed-posts');
+  if (!posts?.length) {
+    c.innerHTML = '<div class="empty-state"><div class="icon">🐱</div><p>Aucune photo ici... Soyez le premier à publier !</p></div>'; return;
   }
-  container.innerHTML = posts.map((p, i) => renderPostCard(p, i)).join('');
+  c.innerHTML = posts.map((p, i) => postCardHTML(p, i)).join('');
 }
 
-function privacyLabel(p) {
-  const map = { public: ['🌍 Public','privacy-public'], kids: ['🧒 Enfants','privacy-kids'], friends: ['👥 Amis','privacy-friends'], friends_except: ['👥 Amis sauf','privacy-custom'], private: ['🔒 Privée','privacy-private'] };
-  return map[p] || map['public'];
-}
-
-function timeAgo(ts) {
-  const diff = Date.now() - new Date(ts).getTime();
-  const mins = Math.floor(diff/60000);
-  if (mins < 1) return 'à l\'instant';
-  if (mins < 60) return `il y a ${mins} min`;
-  const hrs = Math.floor(mins/60);
-  if (hrs < 24) return `il y a ${hrs}h`;
-  return `il y a ${Math.floor(hrs/24)}j`;
-}
-
-function renderPostCard(p, i) {
-  const [privText, privClass] = privacyLabel(p.privacy);
-  const username = p.profiles?.username || 'anonyme';
-  const avatarLetter = username[0].toUpperCase();
-  const avatarHtml = p.profiles?.avatar_url
-    ? `<img src="${p.profiles.avatar_url}" alt="">`
-    : avatarLetter;
-  const imageHtml = p.image_url
-    ? `<div style="aspect-ratio:4/3;overflow:hidden;background:var(--warm)"><img src="${p.image_url}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;font-size:80px>🐱</div>'"></div>`
-    : `<div style="aspect-ratio:4/3;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:80px">🐱</div>`;
-  const comments = (p.comments || []).slice(0,2).map(c => `
-    <div class="comment">
-      <div class="comment-avatar">${(c.profiles?.username||'?')[0].toUpperCase()}</div>
-      <div class="comment-bubble">
-        <div class="author">${c.profiles?.username||'?'}</div>
-        ${c.content}
-      </div>
-    </div>`).join('');
-  return `<div class="post-card" style="animation-delay:${i*0.08}s">
+function postCardHTML(p, i = 0) {
+  const [pText, pClass] = privacyInfo(p.privacy);
+  const uname = p.profiles?.username || p.username || 'anonyme';
+  const initials = uname[0].toUpperCase();
+  const avatarEl = p.profiles?.avatar_url
+    ? `<img src="${p.profiles.avatar_url}" alt="" onerror="this.outerHTML='${initials}'">`
+    : initials;
+  const imgEl = p.image_url
+    ? `<img src="${p.image_url}" alt="${esc(p.title)}" loading="lazy" onerror="this.style.display='none'">`
+    : '🐱';
+  const likedCls = p._liked ? 'liked' : '';
+  const likeIcon = p._liked ? '❤️' : '🤍';
+  const isOwn = currentUser && (p.user_id === currentUser.id);
+  const deleteBtn = isOwn ? `<button class="action-btn delete-btn ml-auto" onclick="deletePost('${p.id}','${p.image_path||''}')">🗑️</button>` : '';
+  return `
+  <div class="post-card" id="post-${p.id}" style="animation-delay:${i*.08}s">
     <div class="post-header">
-      <div class="post-avatar">${avatarHtml}</div>
+      <div class="post-avatar">${avatarEl}</div>
       <div class="post-user-info">
-        <div class="username">${username}</div>
-        <div class="meta">
-          ${timeAgo(p.created_at)}
-          <span class="privacy-badge ${privClass}">${privText}</span>
-        </div>
+        <div class="username">${esc(uname)}</div>
+        <div class="meta">${timeAgo(p.created_at)} · <span class="privacy-badge ${pClass}">${pText}</span></div>
       </div>
     </div>
-    <h3 class="post-title">${p.title||''}</h3>
-    ${imageHtml}
-    ${p.description ? `<p class="post-desc">${p.description}</p>` : ''}
+    <h3 class="post-title">${esc(p.title)}</h3>
+    <div class="post-img-wrap" onclick="openPostModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">${imgEl}</div>
+    ${p.description ? `<p class="post-desc">${esc(p.description)}</p>` : ''}
     <div class="post-actions">
-      <button class="action-btn" onclick="toggleLike('${p.id}',this)" id="like-btn-${p.id}">
-        <span class="icon">🤍</span> <span class="like-count">${p.likes_count||0}</span>
+      <button class="action-btn ${likedCls}" id="like-${p.id}" onclick="toggleLike('${p.id}',this)">
+        <span class="like-icon">${likeIcon}</span> <span class="lc">${p.likes_count||0}</span>
       </button>
-      <button class="action-btn" onclick="toggleComments('comments-${p.id}')">
-        <span>💬</span> ${(p.comments||[]).length}
+      <button class="action-btn" onclick="toggleComments('${p.id}')">
+        💬 <span id="cc-${p.id}">${p.comments_count||0}</span>
       </button>
-      <button class="action-btn" onclick="sharePost('${p.id}')">
-        <span>📤</span>
-      </button>
+      <button class="action-btn" onclick="sharePost('${p.id}')">📤</button>
+      ${deleteBtn}
     </div>
-    <div class="comments-section" id="comments-${p.id}" style="display:none">
-      ${comments}
+    <div class="comments-section" id="cs-${p.id}">
+      <div id="clist-${p.id}"></div>
+      ${currentUser ? `
       <div class="comment-input-row">
-        <input class="comment-input" placeholder="Un commentaire... 🐱" id="ci-${p.id}">
-        <button class="comment-send" onclick="postComment('${p.id}')">➤</button>
-      </div>
+        <input class="comment-input" id="ci-${p.id}" placeholder="Un commentaire... 🐱" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
+        <button class="comment-send" onclick="addComment('${p.id}')">➤</button>
+      </div>` : `<p class="text-sm text-muted text-center"><a onclick="showModal('login')" style="color:var(--orange);cursor:pointer">Connectez-vous</a> pour commenter</p>`}
     </div>
   </div>`;
 }
 
-function toggleComments(id) {
-  const el = document.getElementById(id);
-  if (el) { el.style.display = el.style.display === 'none' ? '' : 'none'; }
-}
-
+// ───────────────── TOGGLE LIKE ─────────────────
 async function toggleLike(postId, btn) {
-  if (!currentUser && !localPosts.length) { showModal('login'); return; }
-  const countEl = btn.querySelector('.like-count');
-  const icon = btn.querySelector('.icon');
+  if (!currentUser) { showModal('login'); return; }
+  const lc = btn.querySelector('.lc');
+  const icon = btn.querySelector('.like-icon');
   const liked = btn.classList.contains('liked');
+  // Optimistic UI
   btn.classList.toggle('liked');
   icon.textContent = liked ? '🤍' : '❤️';
-  countEl.textContent = parseInt(countEl.textContent) + (liked ? -1 : 1);
-  if (!supabase || SUPABASE_URL.includes('VOTRE-PROJET')) return;
+  lc.textContent = parseInt(lc.textContent) + (liked ? -1 : 1);
+  if (!IS_CONFIGURED) return;
   try {
     if (liked) {
-      await supabase.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
-      await supabase.from('posts').update({ likes_count: parseInt(countEl.textContent) }).eq('id', postId);
+      await sb.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
     } else {
-      await supabase.from('likes').insert({ post_id: postId, user_id: currentUser.id });
-      await supabase.from('posts').update({ likes_count: parseInt(countEl.textContent) }).eq('id', postId);
+      await sb.from('likes').insert({ post_id: postId, user_id: currentUser.id });
     }
-  } catch(e) { console.error(e); }
-}
-
-async function postComment(postId) {
-  const input = document.getElementById(`ci-${postId}`);
-  const content = input?.value?.trim();
-  if (!content) return;
-  if (!currentUser) { showModal('login'); return; }
-  input.value = '';
-  const commentsDiv = document.getElementById(`comments-${postId}`);
-  const newComment = `<div class="comment">
-    <div class="comment-avatar">${(currentProfile?.username||'?')[0].toUpperCase()}</div>
-    <div class="comment-bubble"><div class="author">${currentProfile?.username||'?'}</div>${content}</div>
-  </div>`;
-  commentsDiv.insertAdjacentHTML('afterbegin', newComment);
-  if (!supabase || SUPABASE_URL.includes('VOTRE-PROJET')) return;
-  try {
-    await supabase.from('comments').insert({ post_id: postId, user_id: currentUser.id, content });
-  } catch(e) { console.error(e); }
-}
-
-function sharePost(postId) {
-  if (navigator.share) {
-    navigator.share({ title: 'tifapng', text: 'Regarde cette photo de chat !', url: window.location.href });
-  } else {
-    navigator.clipboard?.writeText(window.location.href);
-    toast('Lien copié ! 📋', 'info');
+  } catch(e) {
+    // Rollback
+    btn.classList.toggle('liked');
+    icon.textContent = liked ? '❤️' : '🤍';
+    lc.textContent = parseInt(lc.textContent) + (liked ? 1 : -1);
   }
 }
 
-// ════════════════════════════════════════
-// PUBLISH
-// ════════════════════════════════════════
-let uploadedImageUrl = null;
+// ───────────────── COMMENTS ─────────────────
+async function toggleComments(postId) {
+  const cs = el(`cs-${postId}`);
+  if (!cs) return;
+  const open = cs.style.display !== 'none' && cs.style.display !== '';
+  cs.style.display = open ? 'none' : '';
+  if (!open && IS_CONFIGURED) await loadComments(postId);
+}
 
-function handleFileUpload(event) {
+async function loadComments(postId) {
+  const list = el(`clist-${postId}`);
+  if (!list) return;
+  list.innerHTML = '<div class="loader" style="padding:12px"><div class="spinner" style="width:24px;height:24px;border-width:2px"></div></div>';
+  const { data } = await sb.from('comments')
+    .select('id,content,created_at,user_id,profiles(username,avatar_url)')
+    .eq('post_id', postId).order('created_at');
+  list.innerHTML = (data||[]).map(c => {
+    const u = c.profiles?.username || '?';
+    return `<div class="comment">
+      <div class="comment-avatar">${u[0].toUpperCase()}</div>
+      <div class="comment-bubble"><div class="author">${esc(u)}</div>${esc(c.content)}</div>
+    </div>`;
+  }).join('') || '';
+}
+
+async function addComment(postId) {
+  if (!currentUser) { showModal('login'); return; }
+  const input = el(`ci-${postId}`);
+  const content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  // Optimistic
+  const list = el(`clist-${postId}`);
+  const u = currentProfile?.username || '?';
+  const div = document.createElement('div');
+  div.className = 'comment';
+  div.innerHTML = `<div class="comment-avatar">${u[0].toUpperCase()}</div><div class="comment-bubble"><div class="author">${esc(u)}</div>${esc(content)}</div>`;
+  list.appendChild(div);
+  const cc = el(`cc-${postId}`);
+  if (cc) cc.textContent = parseInt(cc.textContent) + 1;
+  if (!IS_CONFIGURED) return;
+  await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, content });
+}
+
+// ───────────────── DELETE POST ─────────────────
+async function deletePost(postId, imagePath) {
+  if (!confirm('Supprimer cette publication ?')) return;
+  if (!IS_CONFIGURED) {
+    el(`post-${postId}`)?.remove(); toast('Publication supprimée','success'); return;
+  }
+  if (imagePath) {
+    await sb.storage.from('cat-photos').remove([imagePath]);
+  }
+  const { error } = await sb.from('posts').delete().eq('id', postId);
+  if (error) return toast('Erreur suppression','error');
+  el(`post-${postId}`)?.remove();
+  toast('Publication supprimée','success');
+}
+
+// ───────────────── PUBLISH ─────────────────
+async function publishPost() {
+  if (!currentUser) { showModal('login'); return; }
+  const title = v('pub-title').trim();
+  const desc  = v('pub-desc').trim();
+  const cat   = v('pub-cat');
+  if (!title)    return toast('Titre requis','error');
+  if (!pickedFile) return toast('Ajoutez une photo de chat 📸','error');
+
+  const btn = el('publish-btn');
+  btn.disabled = true; btn.textContent = 'Publication...';
+
+  try {
+    // 1. Upload to Storage
+    const ext = pickedFile.name.split('.').pop().toLowerCase();
+    const path = `${currentUser.id}/${Date.now()}.${ext}`;
+    showProgressBar(0);
+
+    const { data: storageData, error: storageErr } = await sb.storage
+      .from('cat-photos').upload(path, pickedFile, { upsert: false,
+        onUploadProgress: (e) => showProgressBar(Math.round(e.loaded/e.total*100)) });
+    if (storageErr) throw storageErr;
+    showProgressBar(100);
+
+    const { data: { publicUrl } } = sb.storage.from('cat-photos').getPublicUrl(path);
+
+    // 2. Insert post
+    const { error: postErr } = await sb.from('posts').insert({
+      user_id: currentUser.id,
+      title, description: desc,
+      image_url: publicUrl,
+      image_path: path,
+      category: cat,
+      privacy: selectedPrivacy,
+      except_users: exceptUsers
+    });
+    if (postErr) throw postErr;
+
+    closeModal('publish');
+    resetPublishForm();
+    toast('Photo publiée ! 🐱','success');
+    loadFeed(currentCategory);
+  } catch(e) {
+    toast('Erreur : ' + e.message,'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publier 🐱';
+    hideProgressBar();
+  }
+}
+
+function showProgressBar(pct) {
+  const p = el('upload-progress'), b = el('upload-progress-bar');
+  p.style.display = ''; b.style.width = pct + '%';
+}
+function hideProgressBar() {
+  el('upload-progress').style.display = 'none'; el('upload-progress-bar').style.width = '0';
+}
+
+function resetPublishForm() {
+  el('pub-title').value = '';
+  el('pub-desc').value = '';
+  el('upload-preview').style.display = 'none';
+  el('upload-filename').style.display = 'none';
+  el('upload-zone').classList.remove('has-file');
+  pickedFile = null;
+  selectedPrivacy = 'public';
+  exceptUsers = [];
+  document.querySelectorAll('.privacy-option').forEach(o => o.classList.remove('selected'));
+  document.querySelector('[data-p="public"]')?.classList.add('selected');
+  el('except-wrap').classList.remove('visible');
+  renderExceptTags();
+}
+
+function handleFile(event) {
   const file = event.target.files[0];
   if (!file) return;
+  applyFile(file);
+}
+
+function onDragOver(e) { e.preventDefault(); el('upload-zone').classList.add('drag'); }
+function onDrop(e) {
+  e.preventDefault(); el('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) applyFile(file);
+}
+
+function applyFile(file) {
+  if (file.size > 10 * 1024 * 1024) return toast('Fichier trop lourd (max 10 Mo)','error');
+  pickedFile = file;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    uploadedImageUrl = e.target.result;
-    const preview = document.getElementById('upload-preview');
-    preview.src = uploadedImageUrl;
-    preview.style.display = 'block';
-    document.getElementById('upload-zone').classList.add('has-file');
+  reader.onload = e => {
+    const prev = el('upload-preview');
+    prev.src = e.target.result; prev.style.display = 'block';
+    el('upload-zone').classList.add('has-file');
+    const fn = el('upload-filename');
+    fn.style.display = ''; fn.textContent = '✅ ' + file.name;
   };
   reader.readAsDataURL(file);
 }
 
-function previewURL(url) {
-  if (!url) return;
-  const preview = document.getElementById('upload-preview');
-  preview.src = url;
-  preview.style.display = 'block';
-  uploadedImageUrl = url;
-}
-
-async function publishPost() {
-  if (!currentUser && !SUPABASE_URL.includes('VOTRE-PROJET')) { showModal('login'); return; }
-  const title = document.getElementById('pub-title').value.trim();
-  const imageUrl = uploadedImageUrl || document.getElementById('pub-image-url').value.trim();
-  const desc = document.getElementById('pub-desc').value.trim();
-  const category = document.getElementById('pub-category').value;
-  if (!title) return toast('Le titre est requis', 'error');
-  if (!imageUrl) return toast('Ajoutez une photo de chat 📸', 'error');
-
-  const post = {
-    user_id: currentUser?.id || 'demo',
-    title, description: desc, image_url: imageUrl,
-    category, privacy: selectedPrivacy,
-    except_users: exceptUsers,
-    likes_count: 0, created_at: new Date().toISOString(),
-    profiles: { username: currentProfile?.username || 'vous', avatar_url: currentProfile?.avatar_url },
-    comments: []
-  };
-
-  if (supabase && !SUPABASE_URL.includes('VOTRE-PROJET')) {
-    try {
-      // If file upload (base64), upload to Storage first
-      const fileInput = document.getElementById('photo-file');
-      let finalUrl = imageUrl;
-      if (fileInput.files[0]) {
-        const file = fileInput.files[0];
-        const path = `${currentUser.id}/${Date.now()}-${file.name}`;
-        const { data: storageData, error: storageErr } = await supabase.storage.from('cat-photos').upload(path, file);
-        if (!storageErr) {
-          const { data: { publicUrl } } = supabase.storage.from('cat-photos').getPublicUrl(path);
-          finalUrl = publicUrl;
-        }
-      }
-      const { error } = await supabase.from('posts').insert({ ...post, image_url: finalUrl, id: undefined, profiles: undefined, comments: undefined });
-      if (error) throw error;
-    } catch(e) {
-      toast('Erreur publication : ' + e.message, 'error');
-      return;
-    }
-  } else {
-    post.id = Date.now().toString();
-    localPosts.unshift(post);
-    renderPosts(localPosts);
-  }
-
-  closeModal('publish');
-  toast('Photo publiée ! 🐱', 'success');
-  document.getElementById('pub-title').value = '';
-  document.getElementById('pub-desc').value = '';
-  document.getElementById('pub-image-url').value = '';
-  document.getElementById('upload-preview').style.display = 'none';
-  document.getElementById('upload-zone').classList.remove('has-file');
-  uploadedImageUrl = null;
-  if (supabase && !SUPABASE_URL.includes('VOTRE-PROJET')) loadFeed(currentCategory);
-}
-
-// ════════════════════════════════════════
-// PROFILE
-// ════════════════════════════════════════
+// ───────────────── PROFILE ─────────────────
 async function loadProfilePage() {
   if (!currentUser) { showPage('login'); return; }
-  const name = document.getElementById('profile-name-display');
-  const bio = document.getElementById('profile-bio-display');
-  const avatar = document.getElementById('profile-avatar-display');
-  if (currentProfile) {
-    if (name) name.textContent = currentProfile.username || 'Mon profil';
-    if (bio) bio.textContent = currentProfile.bio || 'Amoureux des chats 🐾';
-    if (avatar) {
-      avatar.innerHTML = currentProfile.avatar_url ? `<img src="${currentProfile.avatar_url}">` : '🐱';
-    }
-    // Edit modal prefill
-    const eu = document.getElementById('edit-username');
-    const eb = document.getElementById('edit-bio');
-    const ea = document.getElementById('edit-avatar');
-    if (eu) eu.value = currentProfile.username || '';
-    if (eb) eb.value = currentProfile.bio || '';
-    if (ea) ea.value = currentProfile.avatar_url || '';
-  }
-  const grid = document.getElementById('profile-posts-grid');
-  if (!supabase || SUPABASE_URL.includes('VOTRE-PROJET')) {
-    const myPosts = localPosts.filter(p => p.profiles?.username === currentProfile?.username);
-    document.getElementById('profile-posts-count').textContent = myPosts.length;
-    document.getElementById('profile-likes-count').textContent = myPosts.reduce((a,p)=>a+p.likes_count,0);
-    grid.innerHTML = myPosts.map(p => `
-      <div class="profile-post-thumb">
-        ${p.image_url ? `<img src="${p.image_url}" alt="">` : '🐱'}
-      </div>`).join('') || '<div class="empty-state"><div class="icon">🐱</div><p>Aucune publication</p></div>';
+  if (!currentProfile) await fetchProfile();
+  if (!currentProfile) return;
+
+  const p = currentProfile;
+  el('profile-name-display').textContent  = p.username || 'Mon profil';
+  el('profile-bio-display').textContent   = p.bio || 'Amoureux des chats 🐾';
+  el('profile-avatar-display').innerHTML  = p.avatar_url
+    ? `<img src="${p.avatar_url}" alt="" onerror="this.outerHTML='🐱'">`
+    : (p.username || 'U')[0].toUpperCase();
+  // Prefill edit modal
+  el('edit-username').value = p.username || '';
+  el('edit-bio').value      = p.bio || '';
+
+  if (!IS_CONFIGURED) {
+    el('profile-posts-count').textContent = demoData.length;
+    el('profile-likes-count').textContent = demoData.reduce((a,p)=>a+p.likes_count,0);
+    el('profile-followers-count').textContent = '0';
+    renderProfileGrid(demoData);
     return;
   }
-  try {
-    const { data } = await supabase.from('posts').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-    document.getElementById('profile-posts-count').textContent = data?.length || 0;
-    document.getElementById('profile-likes-count').textContent = (data||[]).reduce((a,p)=>a+p.likes_count,0);
-    grid.innerHTML = (data||[]).map(p => `
-      <div class="profile-post-thumb" onclick="openPostModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-        ${p.image_url ? `<img src="${p.image_url}" alt="">` : '🐱'}
-      </div>`).join('') || '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🐱</div><p>Aucune publication</p></div>';
-  } catch(e) { console.error(e); }
+  const { data: posts } = await sb.from('posts').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  const { count: followers } = await sb.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', currentUser.id);
+  el('profile-posts-count').textContent    = posts?.length || 0;
+  el('profile-likes-count').textContent    = (posts||[]).reduce((a,p)=>a+(p.likes_count||0),0);
+  el('profile-followers-count').textContent = followers || 0;
+  renderProfileGrid(posts || []);
+}
+
+function renderProfileGrid(posts) {
+  const g = el('profile-posts-grid');
+  if (!posts.length) { g.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🐱</div><p>Aucune publication</p></div>'; return; }
+  g.innerHTML = posts.map(p => `
+    <div class="profile-thumb" onclick="openPostModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      ${p.image_url ? `<img src="${p.image_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<div class="profile-thumb-empty">🐱</div>'}
+    </div>`).join('');
 }
 
 async function saveProfile() {
   if (!currentUser) return;
-  const username = document.getElementById('edit-username').value.trim();
-  const bio = document.getElementById('edit-bio').value.trim();
-  const avatar_url = document.getElementById('edit-avatar').value.trim();
-  try {
-    if (supabase && !SUPABASE_URL.includes('VOTRE-PROJET')) {
-      await supabase.from('profiles').upsert({ id: currentUser.id, username, bio, avatar_url });
+  const username  = v('edit-username').trim();
+  const bio       = v('edit-bio').trim();
+  const pin       = v('edit-pin').trim();
+  if (!username) return toast('Nom d\'utilisateur requis','error');
+
+  let avatar_url = currentProfile?.avatar_url;
+
+  // Upload avatar if new file picked
+  if (pickedAvatarFile && IS_CONFIGURED) {
+    const ext = pickedAvatarFile.name.split('.').pop().toLowerCase();
+    const path = `${currentUser.id}/avatar.${ext}`;
+    const { error } = await sb.storage.from('avatars').upload(path, pickedAvatarFile, { upsert: true });
+    if (!error) {
+      const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+      avatar_url = publicUrl + '?t=' + Date.now();
     }
-    currentProfile = { ...currentProfile, username, bio, avatar_url };
-    closeModal('editProfile');
-    loadProfilePage();
-    updateAuthUI();
-    toast('Profil mis à jour 💾', 'success');
-  } catch(e) { toast('Erreur : ' + e.message, 'error'); }
-}
-
-// ════════════════════════════════════════
-// KIDS
-// ════════════════════════════════════════
-function kidsParentLogin() {
-  const email = document.getElementById('kids-parent-email').value;
-  const pin = document.getElementById('kids-parent-pin').value;
-  if (!email || !pin) return toast('Remplissez tous les champs', 'error');
-  // Simple PIN check (in real app, verify against Supabase)
-  if (pin.length !== 4) return toast('Le code doit faire 4 chiffres', 'error');
-  kidsParentAuthed = true;
-  closeModal('kidsLogin');
-  showParentalDashboard();
-  toast('Bienvenue dans l\'espace parents 🌸', 'success');
-}
-
-function showParentalDashboard() {
-  document.getElementById('parental-dashboard').style.display = '';
-  document.getElementById('kids-feed-view').style.display = 'none';
-  loadChildren();
-}
-
-function showKidsFeed() {
-  document.getElementById('parental-dashboard').style.display = 'none';
-  document.getElementById('kids-feed-view').style.display = '';
-  loadKidsFeed();
-}
-
-async function loadKidsFeed() {
-  const container = document.getElementById('kids-posts');
-  let posts = localPosts.filter(p => p.privacy === 'kids' || p.privacy === 'public');
-  container.innerHTML = posts.map(p => `
-    <div class="post-card" style="margin-bottom:16px">
-      <div class="post-header">
-        <div class="post-avatar">${(p.profiles?.username||'?')[0].toUpperCase()}</div>
-        <div class="post-user-info">
-          <div class="username">${p.profiles?.username||'anonyme'}</div>
-          <div class="meta" style="color:var(--kids-pink)">🌸 Contenu enfants</div>
-        </div>
-      </div>
-      <h3 class="post-title">${p.title}</h3>
-      <div style="aspect-ratio:4/3;overflow:hidden;background:var(--warm)">
-        <img src="${p.image_url}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:200px;font-size:80px>🐱</div>'">
-      </div>
-      <div class="post-actions">
-        <button class="action-btn" onclick="this.querySelector(\'.icon\').textContent=\'❤️\';this.classList.add(\'liked\')">
-          <span class="icon">🤍</span> ${p.likes_count}
-        </button>
-      </div>
-    </div>`).join('') || '<div class="empty-state"><div class="icon">🐱</div><p>Aucun contenu enfants disponible</p></div>';
-}
-
-function loadChildren() {
-  if (!children.length) {
-    children = [
-      { id: '1', name: 'Léa', age: 8, avatar: '😸', time_limit_minutes: 45, is_active: true, allowed_categories: ['mignon','chaton'] },
-      { id: '2', name: 'Thomas', age: 11, avatar: '🐱', time_limit_minutes: 60, is_active: true, allowed_categories: ['mignon','drole','chaton'] },
-    ];
+    pickedAvatarFile = null;
   }
-  const list = document.getElementById('children-list');
+
+  const updates = { id: currentUser.id, username, bio, avatar_url };
+  if (pin && pin.length === 4) updates.kids_pin = btoa(pin); // simple base64 (use proper hash in prod)
+
+  if (IS_CONFIGURED) {
+    const { error } = await sb.from('profiles').upsert(updates);
+    if (error) return toast('Erreur : ' + error.message,'error');
+  }
+  currentProfile = { ...currentProfile, ...updates };
+  closeModal('editProfile');
+  loadProfilePage();
+  updateAuthUI();
+  toast('Profil mis à jour 💾','success');
+}
+
+async function handleAvatarFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) return toast('Avatar trop lourd (max 2 Mo)','error');
+  pickedAvatarFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { el('avatar-preview-wrap').innerHTML = `<img src="${e.target.result}" style="width:64px;height:64px;border-radius:50%;object-fit:cover">`; };
+  reader.readAsDataURL(file);
+}
+
+// ───────────────── KIDS ─────────────────
+async function kidsParentLogin() {
+  const email = v('kp-email'), pw = v('kp-pw'), pin = v('kp-pin');
+  if (!email || !pw || !pin) return toast('Remplissez tous les champs','error');
+  if (!IS_CONFIGURED) {
+    kidsAuthed = true; closeModal('kidsLogin'); showParentalDashboard(); return;
+  }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) return toast('Email ou mot de passe incorrect','error');
+  // Verify PIN
+  const { data: prof } = await sb.from('profiles').select('kids_pin').eq('id', data.user.id).single();
+  if (!prof?.kids_pin) return toast('Aucun code parental défini. Créez-en un dans "Modifier le profil"','error');
+  if (prof.kids_pin !== btoa(pin)) return toast('Code parental incorrect','error');
+  currentUser = data.user; await fetchProfile();
+  kidsAuthed = true;
+  closeModal('kidsLogin');
+  updateAuthUI();
+  showParentalDashboard();
+  toast('Bienvenue dans l\'espace parents 🌸','success');
+}
+
+async function showParentalDashboard() {
+  el('kids-features').style.display = 'none';
+  el('parental-dashboard').style.display = '';
+  el('kids-feed-view').style.display = 'none';
+  await loadChildren();
+}
+
+async function loadChildren() {
+  if (!IS_CONFIGURED) {
+    if (!children.length) children = [
+      { id: '1', name: 'Léa', age: 8, avatar: '😸', time_limit_minutes: 45, allowed_categories: ['mignon','chaton'], allowed_channels: [], is_active: true },
+      { id: '2', name: 'Thomas', age: 11, avatar: '🐱', time_limit_minutes: 60, allowed_categories: ['mignon','drole','chaton'], allowed_channels: [], is_active: true }
+    ];
+    renderChildren(); return;
+  }
+  const { data } = await sb.from('children').select('*').eq('parent_id', currentUser.id).order('created_at');
+  children = data || [];
+  renderChildren();
+}
+
+function renderChildren() {
+  const list = el('children-list');
+  if (!children.length) {
+    list.innerHTML = '<p class="text-muted text-sm text-center" style="padding:12px">Aucun enfant ajouté</p>'; return;
+  }
   list.innerHTML = children.map(c => `
-    <div class="child-account-row" id="child-row-${c.id}">
-      <div class="child-avatar">${c.avatar}</div>
+    <div class="child-account-row ${selectedChildId===c.id?'selected':''}" id="crow-${c.id}" onclick="selectChild('${c.id}')">
+      <div class="child-avatar-icon">${c.avatar}</div>
       <div class="child-info">
-        <div class="child-name">${c.name}</div>
-        <div class="child-age">${c.age} ans • Limite : ${c.time_limit_minutes} min/jour</div>
+        <div class="child-name">${esc(c.name)}</div>
+        <div class="child-meta">${c.age} ans • Limite : ${fmtTime(c.time_limit_minutes)}</div>
       </div>
-      <div class="child-actions">
-        <button class="btn btn-sm btn-outline" onclick="selectChild('${c.id}')">⚙️ Gérer</button>
-        <button class="toggle-switch ${c.is_active ? 'on' : ''}" onclick="toggleChild('${c.id}',this)" title="${c.is_active ? 'Activer/Désactiver' : ''}"></button>
-      </div>
+      <button class="toggle-switch ${c.is_active?'on':''}" onclick="event.stopPropagation();toggleChildActive('${c.id}',this)" title="Activer/Désactiver"></button>
     </div>`).join('');
 }
 
@@ -1743,233 +1129,330 @@ function selectChild(id) {
   selectedChildId = id;
   const child = children.find(c => c.id === id);
   if (!child) return;
-  document.getElementById('selected-child-name').textContent = child.name;
-  document.getElementById('time-slider').value = child.time_limit_minutes;
+  // Update selection
+  document.querySelectorAll('.child-account-row').forEach(r => r.classList.remove('selected'));
+  el(`crow-${id}`)?.classList.add('selected');
+  el('selected-child-name').textContent = child.name;
+  el('child-controls').style.display = '';
+  // Time slider
+  el('time-slider').value = child.time_limit_minutes;
   updateTimeDisplay(child.time_limit_minutes);
-  ['selected-child-controls','allowed-channels-card','kids-categories-card'].forEach(id => {
-    document.getElementById(id).style.display = '';
-  });
-  // Channels
-  const channelsGrid = document.getElementById('channels-grid');
-  const mockChannels = ['chatlover','felinophile','refuge13','noctambule','chatmaster42'];
-  channelsGrid.innerHTML = mockChannels.map(ch => {
-    const isAllowed = true; // default
-    return `<div class="channel-chip ${isAllowed ? 'allowed' : 'blocked'}" onclick="toggleChannel(this,'${ch}')">🐱 ${ch}</div>`;
-  }).join('');
   // Categories
   const cats = [
     {k:'mignon',l:'😸 Mignons'},{k:'drole',l:'😂 Drôles'},{k:'dodo',l:'😴 Dodo'},
-    {k:'chaton',l:'🍼 Chatons'},{k:'noir',l:'🐈‍⬛ Noirs'},{k:'roux',l:'🦁 Roux'}
+    {k:'chaton',l:'🍼 Chatons'},{k:'noir',l:'🐈‍⬛ Noirs'},{k:'roux',l:'🦁 Roux'},
+    {k:'persan',l:'👑 Persans'},{k:'siamois',l:'⚡ Siamois'}
   ];
-  document.getElementById('kids-categories-list').innerHTML = cats.map(cat => {
-    const isAllowed = child.allowed_categories?.includes(cat.k);
-    return `<div class="category-pill ${isAllowed ? 'active' : ''}" onclick="toggleCatKids(this,'${cat.k}')">${cat.l}</div>`;
+  el('kids-categories-ctrl').innerHTML = cats.map(cat => {
+    const on = (child.allowed_categories || []).includes(cat.k);
+    return `<div class="category-pill ${on?'active':''}" data-kcat="${cat.k}" onclick="toggleKidsCat(this,'${cat.k}')">${cat.l}</div>`;
+  }).join('');
+  // Channels (use profile usernames from posts)
+  loadAllowedChannels(child);
+  // Stats
+  loadKidsStats(child.id);
+}
+
+async function loadAllowedChannels(child) {
+  if (!IS_CONFIGURED) {
+    el('channels-grid').innerHTML = ['chatlover','felinophile','refuge13','noctambule'].map(u => {
+      const isAllowed = (child.allowed_channels||[]).includes(u);
+      return `<div class="channel-chip ${isAllowed?'allowed':'blocked'}" data-ch="${u}" onclick="toggleChannel(this,'${u}')">🐱 ${u}</div>`;
+    }).join(''); return;
+  }
+  const { data: profiles } = await sb.from('profiles').select('id,username').limit(20);
+  const allowed = child.allowed_channels || [];
+  el('channels-grid').innerHTML = (profiles||[]).map(p => {
+    const on = allowed.includes(p.id);
+    return `<div class="channel-chip ${on?'allowed':'blocked'}" data-ch="${p.id}" onclick="toggleChannel(this,'${p.id}')">🐱 ${esc(p.username)}</div>`;
   }).join('');
 }
 
-function toggleChild(id, btn) {
+async function loadKidsStats(childId) {
+  if (!IS_CONFIGURED) return;
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await sb.from('kids_sessions').select('*').eq('child_id', childId).eq('session_date', today).single();
+  if (data) {
+    el('stat-mins').textContent  = data.minutes_used;
+    el('stat-views').textContent = data.posts_viewed;
+    el('stat-likes').textContent = data.likes_given;
+  }
+}
+
+function toggleKidsCat(el, cat) { el.classList.toggle('active'); }
+function toggleChannel(el, ch) { el.classList.toggle('allowed'); el.classList.toggle('blocked'); }
+
+async function toggleChildActive(id, btn) {
   const child = children.find(c => c.id === id);
-  if (child) { child.is_active = !child.is_active; btn.classList.toggle('on'); }
+  if (!child) return;
+  child.is_active = !child.is_active;
+  btn.classList.toggle('on');
+  if (!IS_CONFIGURED) return;
+  await sb.from('children').update({ is_active: child.is_active }).eq('id', id);
 }
 
-function toggleChannel(el, ch) {
-  el.classList.toggle('allowed');
-  el.classList.toggle('blocked');
+async function saveChildSettings() {
+  if (!selectedChildId) return;
+  const child = children.find(c => c.id === selectedChildId);
+  if (!child) return;
+  const timeVal = parseInt(el('time-slider').value);
+  const allowedCats = [...document.querySelectorAll('#kids-categories-ctrl [data-kcat].active')].map(e => e.dataset.kcat);
+  const allowedChannels = [...document.querySelectorAll('#channels-grid .channel-chip.allowed')].map(e => e.dataset.ch);
+  child.time_limit_minutes = timeVal;
+  child.allowed_categories = allowedCats;
+  child.allowed_channels = allowedChannels;
+  if (IS_CONFIGURED) {
+    await sb.from('children').update({ time_limit_minutes: timeVal, allowed_categories: allowedCats, allowed_channels: allowedChannels }).eq('id', selectedChildId);
+  }
+  renderChildren();
+  toast('Paramètres enregistrés 💾','success');
 }
 
-function toggleCatKids(el, cat) {
-  el.classList.toggle('active');
+async function deleteChild() {
+  if (!selectedChildId) return;
+  if (!confirm('Supprimer ce compte enfant ?')) return;
+  if (IS_CONFIGURED) await sb.from('children').delete().eq('id', selectedChildId);
+  children = children.filter(c => c.id !== selectedChildId);
+  selectedChildId = null;
+  el('child-controls').style.display = 'none';
+  renderChildren();
+  toast('Compte supprimé','success');
+}
+
+async function addChild() {
+  const name   = v('new-child-name').trim();
+  const age    = parseInt(v('new-child-age'));
+  const avatar = v('new-child-avatar');
+  if (!name || !age) return toast('Remplissez le prénom et l\'âge','error');
+  const childData = { name, age, avatar, time_limit_minutes: 60, allowed_categories: ['mignon','chaton'], allowed_channels: [], is_active: true };
+  if (IS_CONFIGURED && currentUser) {
+    const { data, error } = await sb.from('children').insert({ ...childData, parent_id: currentUser.id }).select().single();
+    if (error) return toast('Erreur : ' + error.message,'error');
+    children.push(data);
+  } else {
+    children.push({ ...childData, id: Date.now().toString() });
+  }
+  closeModal('addChild');
+  renderChildren();
+  el('new-child-name').value = '';
+  el('new-child-age').value = '';
+  toast(`${name} ajouté(e) ! 🌸`,'success');
+}
+
+function pickAvatar(btn, emoji) {
+  document.querySelectorAll('[onclick^="pickAvatar"]').forEach(e => e.classList.remove('active'));
+  btn.classList.add('active');
+  el('new-child-avatar').value = emoji;
 }
 
 function updateTimeDisplay(val) {
-  const h = Math.floor(val/60);
-  const m = val%60;
-  document.getElementById('time-display').textContent = h > 0 ? `${h}h ${m}min / jour` : `${m} min / jour`;
-  // Update slider gradient
-  const slider = document.getElementById('time-slider');
+  val = parseInt(val);
+  el('time-display').textContent = fmtTime(val);
   const pct = ((val-15)/(240-15))*100;
-  slider.style.background = `linear-gradient(90deg, var(--kids-pink) ${pct}%, var(--warm) ${pct}%)`;
+  el('time-slider').style.background = `linear-gradient(90deg,var(--kids-pink) ${pct}%,var(--warm) ${pct}%)`;
 }
 
-function saveTimeLimit() {
-  if (!selectedChildId) return;
-  const val = document.getElementById('time-slider').value;
-  const child = children.find(c => c.id === selectedChildId);
-  if (child) { child.time_limit_minutes = parseInt(val); loadChildren(); }
-  toast('Limite de temps enregistrée ⏱️', 'success');
+function fmtTime(mins) {
+  const h = Math.floor(mins/60), m = mins%60;
+  return h > 0 ? `${h}h ${m}min / jour` : `${m} min / jour`;
 }
 
-function saveCategories() {
-  toast('Catégories enregistrées 🏷️', 'success');
+// KIDS FEED (enfant)
+async function enterKidMode() {
+  kidsModeActive = true;
+  el('kids-features').style.display = 'none';
+  el('parental-dashboard').style.display = 'none';
+  el('kids-feed-view').style.display = '';
+  await loadKidsFeed();
 }
 
-function addChild() {
-  const name = document.getElementById('child-name').value.trim();
-  const age = parseInt(document.getElementById('child-age').value);
-  const avatar = document.getElementById('child-avatar').value;
-  if (!name || !age) return toast('Remplissez le prénom et l\'âge', 'error');
-  children.push({ id: Date.now().toString(), name, age, avatar, time_limit_minutes: 60, is_active: true, allowed_categories: ['mignon','chaton'] });
-  closeModal('addChild');
-  loadChildren();
-  toast(`${name} ajouté(e) ! 🌸`, 'success');
+function exitKidMode() {
+  kidsModeActive = false;
+  el('kids-features').style.display = '';
+  el('kids-feed-view').style.display = 'none';
+  el('parental-dashboard').style.display = kidsAuthed ? '' : 'none';
 }
 
-function selectChildAvatar(el, emoji) {
-  document.querySelectorAll('[onclick^="selectChildAvatar"]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('child-avatar').value = emoji;
-  selectedChildAvatar_val = emoji;
+async function loadKidsFeed() {
+  const c = el('kids-posts');
+  c.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  let posts = IS_CONFIGURED
+    ? (await sb.from('posts').select('*,profiles(username,avatar_url)').eq('privacy','kids').order('created_at',{ascending:false}).limit(20)).data || []
+    : demoData.filter(p => p.privacy === 'kids' || p.privacy === 'public');
+  c.innerHTML = posts.map(p => `
+    <div class="kids-post-card">
+      <div style="padding:14px 18px 0;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--kids-pink);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px">${(p.profiles?.username||'?')[0].toUpperCase()}</div>
+        <div style="font-weight:600;font-size:14px">${esc(p.profiles?.username||'anonyme')}</div>
+      </div>
+      <h3 style="font-family:'Fraunces',serif;padding:10px 18px 4px;font-size:18px">${esc(p.title)}</h3>
+      <div style="aspect-ratio:4/3;overflow:hidden;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:80px">
+        ${p.image_url ? `<img src="${p.image_url}" alt="" style="width:100%;height:100%;object-fit:cover">` : '🐱'}
+      </div>
+      <div style="padding:14px 18px;display:flex;gap:12px">
+        <button class="action-btn" onclick="kidsLike(this)">🤍 ${p.likes_count||0}</button>
+      </div>
+    </div>`).join('') || '<div class="empty-state"><div class="icon">🐱</div><p>Aucun contenu enfants disponible</p></div>';
 }
 
-// ════════════════════════════════════════
-// PRIVACY SELECTOR
-// ════════════════════════════════════════
-function selectPrivacy(el) {
-  document.querySelectorAll('.privacy-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedPrivacy = el.dataset.privacy;
-  const wrap = document.getElementById('friends-except-wrap');
-  wrap.classList.toggle('visible', selectedPrivacy === 'friends_except');
+function kidsLike(btn) {
+  btn.innerHTML = `❤️ ${parseInt(btn.textContent.replace(/[^0-9]/g,''))+1}`;
+  const s = el('stat-likes');
+  if (s) s.textContent = parseInt(s.textContent)+1;
 }
 
-function addExceptTag(e) {
-  if (e.key !== 'Enter') return;
-  const val = e.target.value.trim();
-  if (!val || exceptUsers.includes(val)) return;
-  exceptUsers.push(val);
-  e.target.value = '';
-  renderExceptTags();
-}
-
-function renderExceptTags() {
-  const wrap = document.getElementById('except-tags');
-  const input = document.getElementById('except-input');
-  const existing = wrap.querySelectorAll('.tag');
-  existing.forEach(e => e.remove());
-  exceptUsers.forEach((u, i) => {
-    const tag = document.createElement('div');
-    tag.className = 'tag';
-    tag.innerHTML = `${u} <span class="remove" onclick="removeExcept(${i})">✕</span>`;
-    wrap.insertBefore(tag, input);
-  });
-}
-
-function removeExcept(i) {
-  exceptUsers.splice(i, 1);
-  renderExceptTags();
-}
-
-// ════════════════════════════════════════
-// CATEGORIES
-// ════════════════════════════════════════
-document.addEventListener('click', e => {
-  const pill = e.target.closest('[data-cat]');
-  if (!pill) return;
-  document.querySelectorAll('[data-cat]').forEach(p => p.classList.remove('active'));
-  pill.classList.add('active');
-  currentCategory = pill.dataset.cat;
-  loadFeed(currentCategory);
-});
-
-// ════════════════════════════════════════
-// PAGE NAVIGATION
-// ════════════════════════════════════════
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const page = document.getElementById('page-' + name);
-  if (page) page.classList.add('active');
-  window.scrollTo(0, 0);
-  if (name === 'feed') { loadFeed(currentCategory); updateAuthUI(); }
-  if (name === 'profile') { loadProfilePage(); }
-  if (name === 'kids') {
-    document.getElementById('parental-dashboard').style.display = 'none';
-    document.getElementById('kids-feed-view').style.display = 'none';
-  }
-}
-
-function goHome() {
-  showPage(currentUser ? 'feed' : 'landing');
-}
-
-// ════════════════════════════════════════
-// MODAL SYSTEM
-// ════════════════════════════════════════
-function showModal(name) {
-  const overlay = document.getElementById('modal-' + name);
-  if (overlay) { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
-  // If publish modal, reset
-  if (name === 'publish') {
-    selectedPrivacy = 'public';
-    exceptUsers = [];
-    document.querySelectorAll('.privacy-option').forEach(o => o.classList.remove('selected'));
-    const pub = document.querySelector('[data-privacy="public"]');
-    if (pub) pub.classList.add('selected');
-    document.getElementById('friends-except-wrap').classList.remove('visible');
-  }
-}
-
-function closeModal(name) {
-  const overlay = document.getElementById('modal-' + name);
-  if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-}
-
-// Close on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) {
-      const id = overlay.id.replace('modal-', '');
-      closeModal(id);
-    }
-  });
-});
-
-// ════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════
-function toast(msg, type = 'info') {
-  const wrap = document.getElementById('toast-wrap');
-  const icons = { success: '✅', error: '❌', info: '🐱' };
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
-  wrap.appendChild(el);
-  setTimeout(() => el.remove(), 3100);
-}
-
-// ════════════════════════════════════════
-// POST MODAL
-// ════════════════════════════════════════
+// ───────────────── POST MODAL ─────────────────
 function openPostModal(post) {
-  const [privText, privClass] = privacyLabel(post.privacy);
-  document.getElementById('modal-post-content').innerHTML = `
-    <div style="aspect-ratio:1;max-height:400px;overflow:hidden;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:80px">
-      ${post.image_url ? `<img src="${post.image_url}" alt="" style="width:100%;height:100%;object-fit:cover">` : '🐱'}
+  const [pText, pClass] = privacyInfo(post.privacy);
+  el('modal-post-content').innerHTML = `
+    <div style="aspect-ratio:1;max-height:420px;overflow:hidden;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:80px">
+      ${post.image_url ? `<img src="${post.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🐱'}
     </div>
-    <div style="padding:20px">
-      <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:8px">${post.title}</h3>
-      ${post.description ? `<p style="font-size:14px;color:var(--muted);margin-bottom:12px">${post.description}</p>` : ''}
-      <span class="privacy-badge ${privClass}">${privText}</span>
+    <div style="padding:24px">
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:8px">${esc(post.title)}</h3>
+      ${post.description ? `<p style="font-size:14px;color:var(--muted);margin-bottom:12px">${esc(post.description)}</p>` : ''}
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="privacy-badge ${pClass}">${pText}</span>
+        <span style="font-size:13px;color:var(--muted)">❤️ ${post.likes_count||0} likes</span>
+      </div>
     </div>`;
   showModal('post');
 }
 
-// ════════════════════════════════════════
-// KEYBOARD
-// ════════════════════════════════════════
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.open').forEach(o => {
-      closeModal(o.id.replace('modal-',''));
-    });
+// ───────────────── PRIVACY ─────────────────
+function privacyInfo(p) {
+  const m = { public:['🌍 Public','privacy-public'], kids:['🧒 Enfants','privacy-kids'], friends:['👥 Amis','privacy-friends'], friends_except:['👥 Amis sauf','privacy-custom'], private:['🔒 Privée','privacy-private'] };
+  return m[p] || m['public'];
+}
+
+document.addEventListener('click', e => {
+  const opt = e.target.closest('.privacy-option');
+  if (opt && opt.closest('#modal-publish')) {
+    document.querySelectorAll('.privacy-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedPrivacy = opt.dataset.p;
+    el('except-wrap').classList.toggle('visible', selectedPrivacy === 'friends_except');
   }
 });
 
-// Load feed on start if no landing shown
-setTimeout(() => {
-  if (document.getElementById('page-landing').classList.contains('active')) {
-    loadDemoData(); // preload for demo
+function addExceptTag(e) {
+  if (e.key !== 'Enter') return;
+  const val = e.target.value.trim().replace('@','');
+  if (!val || exceptUsers.includes(val)) return;
+  exceptUsers.push(val); e.target.value = '';
+  renderExceptTags();
+}
+function renderExceptTags() {
+  const wrap = el('except-tags'), input = el('except-input');
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  exceptUsers.forEach((u, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `@${esc(u)} <span class="remove" onclick="removeExcept(${i})">✕</span>`;
+    wrap.insertBefore(tag, input);
+  });
+}
+function removeExcept(i) { exceptUsers.splice(i,1); renderExceptTags(); }
+
+// ───────────────── CATEGORIES ─────────────────
+function filterCat(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('[data-cat]').forEach(p => p.classList.toggle('active', p.dataset.cat === cat));
+  if (document.getElementById('page-feed').classList.contains('active')) loadFeed(cat);
+}
+document.addEventListener('click', e => {
+  const pill = e.target.closest('[data-cat]');
+  if (!pill) return;
+  filterCat(pill.dataset.cat);
+});
+
+// ───────────────── SHARE ─────────────────
+function sharePost(id) {
+  if (navigator.share) { navigator.share({ title: 'tifapng 🐱', url: location.href }); }
+  else { navigator.clipboard?.writeText(location.href); toast('Lien copié 📋','info'); }
+}
+
+// ───────────────── PAGE NAV ─────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const p = el('page-' + name);
+  if (p) p.classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'feed')    { loadFeed(currentCategory); updateAuthUI(); }
+  if (name === 'profile') { loadProfilePage(); }
+  if (name === 'kids')    { el('kids-features').style.display=''; el('parental-dashboard').style.display='none'; el('kids-feed-view').style.display='none'; }
+}
+function goHome() { showPage(currentUser ? 'feed' : 'landing'); }
+
+// ───────────────── MODAL SYSTEM ─────────────────
+function showModal(name) {
+  const m = el('modal-' + name);
+  if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+function closeModal(name) {
+  const m = el('modal-' + name);
+  if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id.replace('modal-','')); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(o => closeModal(o.id.replace('modal-','')));
+});
+
+// ───────────────── TOAST ─────────────────
+function toast(msg, type = 'info') {
+  const icons = { success:'✅', error:'❌', info:'🐱' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  el('toast-wrap').appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+// ───────────────── DEMO DATA ─────────────────
+const demoData = [
+  { id:'d1', title:'Milo fait la sieste 😴', description:'18h de sommeil par jour c\'est pas de trop', image_url:'https://placecats.com/400/300', category:'dodo', privacy:'public', likes_count:47, comments_count:3, user_id:'demo', profiles:{username:'chatlover',avatar_url:null}, created_at:new Date(Date.now()-3600000).toISOString() },
+  { id:'d2', title:'Luna la chasseuse 🎯', description:'Elle a attrapé une plume imaginaire', image_url:'https://placecats.com/401/300', category:'drole', privacy:'public', likes_count:82, comments_count:5, user_id:'demo', profiles:{username:'felinophile',avatar_url:null}, created_at:new Date(Date.now()-7200000).toISOString() },
+  { id:'d3', title:'Chaton du refuge 🏠', description:'Il cherche une famille aimante !', image_url:'https://placecats.com/402/300', category:'chaton', privacy:'kids', likes_count:134, comments_count:12, user_id:'demo', profiles:{username:'refuge13',avatar_url:null}, created_at:new Date(Date.now()-86400000).toISOString() },
+  { id:'d4', title:'Minuit le fantôme 🖤', description:'Impossible de le voir dans le noir 😂', image_url:'https://placecats.com/403/300', category:'noir', privacy:'public', likes_count:59, comments_count:2, user_id:'demo', profiles:{username:'noctambule',avatar_url:null}, created_at:new Date(Date.now()-172800000).toISOString() },
+];
+function loadDemoData() { renderPosts(demoData); }
+
+// ───────────────── UTILS ─────────────────
+const el = id => document.getElementById(id);
+const v  = id => el(id)?.value || '';
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function timeAgo(ts) {
+  const d = Date.now() - new Date(ts).getTime(), m = Math.floor(d/60000);
+  if (m < 1) return 'à l\'instant'; if (m < 60) return `${m} min`; const h = Math.floor(m/60);
+  if (h < 24) return `${h}h`; return `${Math.floor(h/24)}j`;
+}
+function setLoading(id, on) { const e = el(id); if (e) { e.disabled = on; e.textContent = on ? '...' : 'Se connecter 🐾'; } }
+
+// ───────────────── BOOT ─────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  init();
+  // Realtime subscription (only if configured)
+  if (IS_CONFIGURED) {
+    setTimeout(() => {
+      if (!sb) return;
+      sb.channel('posts').on('postgres_changes', { event:'INSERT', schema:'public', table:'posts' }, payload => {
+        if (document.getElementById('page-feed').classList.contains('active')) {
+          const p = payload.new;
+          if (p.privacy === 'public' || p.privacy === 'kids' || (currentUser && p.user_id === currentUser.id)) {
+            const container = el('feed-posts');
+            const div = document.createElement('div');
+            div.innerHTML = postCardHTML(p, 0);
+            container.insertBefore(div.firstChild, container.firstChild);
+          }
+        }
+      }).subscribe();
+    }, 2000);
+  } else {
+    loadDemoData();
   }
-}, 100);
+});
 </script>
 </body>
 </html>
