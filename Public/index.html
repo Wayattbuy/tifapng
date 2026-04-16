@@ -3,40 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="stylesheet" href="css/style.css">
 <title>TifaPNG</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#f0f2f5}
+.topbar{height:60px;background:white;display:flex;align-items:center;padding:0 20px;box-shadow:0 1px 3px rgba(0,0,0,0.1);position:fixed;width:100%}
+.logo{font-weight:bold;font-size:20px}
+.layout{display:grid;grid-template-columns:250px 1fr 250px;margin-top:60px}
+.sidebar{padding:20px}
+.feed{max-width:600px;margin:auto;padding:20px}
+.post{background:white;border-radius:10px;padding:15px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.post img{width:100%;border-radius:10px}
+button{padding:8px;border:none;border-radius:8px;background:#e4e6eb;cursor:pointer}
+input,select{width:100%;padding:8px;margin-top:5px;margin-bottom:10px}
+.hidden{display:none}
+</style>
 </head>
 <body>
 
-<header class="topbar">
+<div class="topbar">
 <div class="logo">TifaPNG</div>
-<input class="search" placeholder="Rechercher des chats">
-<div class="top-icons">
-<a href="index.html">🏠</a>
-<a href="publier.html">＋</a>
-<a href="compte.html">👤</a>
 </div>
-</header>
 
 <div class="layout">
 
-<aside class="sidebar-left">
-<a href="index.html">Feed</a>
-<a href="publier.html">Publier</a>
-<a href="compte.html">Compte</a>
-<a href="kids.html">TifaPNG Kids</a>
-</aside>
+<div class="sidebar">
+<button onclick="showFeed()">Feed</button>
+<button onclick="showPublish()">Publier</button>
+<button onclick="showKids()">Kids</button>
+<button onclick="logout()">Logout</button>
+</div>
 
-<main class="feed" id="feed">
-</main>
+<div class="feed">
 
-<aside class="sidebar-right">
-<h3>Catégories</h3>
-<div id="categories"></div>
-</aside>
+<div id="login">
+<h2>Connexion</h2>
+<input id="email" placeholder="email">
+<input id="password" type="password" placeholder="password">
+<button onclick="login()">Connexion</button>
+</div>
+
+<div id="feed" class="hidden"></div>
+
+<div id="publish" class="hidden">
+<div class="post">
+<h3>Publier chat</h3>
+<input id="title" placeholder="Titre">
+
+<select id="visibility">
+<option>Public</option>
+<option>Enfants</option>
+<option>Amis</option>
+<option>Amis sauf</option>
+<option>Privée</option>
+</select>
+
+<input type="file" id="image">
+<button onclick="publish()">Publier</button>
+</div>
+</div>
+
+<div id="kids" class="hidden">
+<div class="post">
+<h3>TifaPNG Kids</h3>
+<label>Limite temps (minutes)</label>
+<input id="timeLimit" type="number">
+<button onclick="saveKids()">Sauvegarder</button>
+</div>
+</div>
 
 </div>
 
-<script src="js/app.js"></script>
+<div class="sidebar"></div>
+
+</div>
+
+<script>
+
+const supabase = window.supabase.createClient(
+"https://xlpcjuucnmajkixbyfol.supabase.co",
+"sb_publishable_wAcTUGOLQ6S4cfBvA4qOBA_unov1oBW"
+)
+
+function showFeed(){
+hideAll()
+document.getElementById('feed').classList.remove('hidden')
+loadFeed()
+}
+
+function showPublish(){
+hideAll()
+document.getElementById('publish').classList.remove('hidden')
+}
+
+function showKids(){
+hideAll()
+document.getElementById('kids').classList.remove('hidden')
+}
+
+function hideAll(){
+document.querySelectorAll('#feed,#publish,#kids').forEach(e=>e.classList.add('hidden'))
+}
+
+async function login(){
+await supabase.auth.signInWithPassword({
+email:email.value,
+password:password.value
+})
+showFeed()
+}
+
+async function logout(){
+await supabase.auth.signOut()
+location.reload()
+}
+
+async function loadFeed(){
+const { data } = await supabase
+.from('posts')
+.select('*')
+.order('created_at',{ascending:false})
+
+const feed=document.getElementById('feed')
+feed.innerHTML=''
+
+(data||[]).forEach(p=>{
+const div=document.createElement('div')
+div.className='post'
+
+div.innerHTML=`
+<img src="${p.image}">
+<h3>${p.title}</h3>
+<button onclick="comment('${p.id}')">Commenter</button>
+`
+
+feed.appendChild(div)
+})
+}
+
+async function publish(){
+const file=image.files[0]
+const fileName=Date.now()+file.name
+
+await supabase.storage.from('cats').upload(fileName,file)
+
+const { data:url }=supabase.storage.from('cats').getPublicUrl(fileName)
+
+const { data:user }=await supabase.auth.getUser()
+
+await supabase.from('posts').insert({
+title:title.value,
+image:url.publicUrl,
+visibility:visibility.value,
+user_id:user.user.id
+})
+
+showFeed()
+}
+
+async function saveKids(){
+const { data:user }=await supabase.auth.getUser()
+
+await supabase.from('kids_controls').upsert({
+child_id:user.user.id,
+time_limit:timeLimit.value
+})
+
+alert('Sauvegardé')
+}
+
+supabase.auth.getSession().then(({data})=>{
+if(data.session) showFeed()
+})
+
+</script>
+
 </body>
 </html>
