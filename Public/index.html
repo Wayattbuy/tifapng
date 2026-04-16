@@ -1220,8 +1220,8 @@ CREATE POLICY "Children own" ON children FOR ALL USING (auth.uid() = parent_id);
 // CONFIGURATION SUPABASE
 // → Remplacez par vos vraies valeurs !
 // ════════════════════════════════════════
-const SUPABASE_URL = 'https://VOTRE-PROJET.supabase.co';
-const SUPABASE_ANON_KEY = 'VOTRE-ANON-KEY';
+const SUPABASE_URL = 'https://xlpcjuucnmajkixbyfol.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhscGNqdXVjbm1hamtpeGJ5Zm9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzU0MDgsImV4cCI6MjA5MTkxMTQwOH0.-kuRLm9nCTBu2em74GyltQnkjYSuhfQhcG1HC_Tlu34';
 
 // ────────────────────────────────────────
 let supabase, currentUser, currentProfile;
